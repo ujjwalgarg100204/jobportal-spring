@@ -1,28 +1,25 @@
 import winston, { format } from "winston";
 
-import { env } from "@/env";
-
 const loggerFormat = format.printf(({ level, message, timestamp }) => {
     return `${timestamp} ${level}: ${message}`;
 });
 
 export const logger = winston.createLogger({
     level: "info",
-    format: format.combine(format.timestamp(), loggerFormat),
+    format: format.combine(
+        format.errors({ stack: true }), // capture stack traces
+        format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+        loggerFormat,
+    ),
     transports: [
+        new winston.transports.Console(),
         new winston.transports.File({
-            filename: "logs/error.log",
+            filename: "logs/all.log",
             level: "error",
         }),
     ],
+    exceptionHandlers: [
+        new winston.transports.File({ filename: "logs/exceptions.log" }),
+    ],
+    exitOnError: false,
 });
-
-// If we're not in production then log to the `console` with the format:
-// `${info.level}: ${info.message} JSON.stringify({ ...rest }) `
-if (env.NODE_ENV !== "production") {
-    logger.add(
-        new winston.transports.Console({
-            format: format.combine(format.timestamp(), loggerFormat),
-        }),
-    );
-}
