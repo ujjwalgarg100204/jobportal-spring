@@ -7,6 +7,6 @@ public enum EmploymentType {
 
     FULL_TIME,
     FREELANCE,
-    PART_TIME;
-
+    PART_TIME,
+    INTERNSHIP;
 }

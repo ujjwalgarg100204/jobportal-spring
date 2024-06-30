@@ -82,7 +82,7 @@ public class AuthController {
         }
         var rRole = Role.builder()
                 .id(2)
-                .name(ERole.RECRUITER)
+                .name(ERole.ROLE_RECRUITER)
                 .build();
         var rUser = User.builder()
                 .email(recruiter.email())
@@ -120,7 +120,7 @@ public class AuthController {
         }
         var cRole = Role.builder()
                 .id(1)
-                .name(ERole.CANDIDATE)
+                .name(ERole.ROLE_CANDIDATE)
                 .build();
         var cUser = User.builder()
                 .email(candidate.email())

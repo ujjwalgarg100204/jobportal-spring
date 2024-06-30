@@ -26,11 +26,11 @@ public class JobportalApplication {
         return runner -> {
             Role candidateRole = Role.builder()
                     .id(1)
-                    .name(ERole.CANDIDATE)
+                    .name(ERole.ROLE_CANDIDATE)
                     .build();
             Role recruiterRole = Role.builder()
                     .id(2)
-                    .name(ERole.RECRUITER)
+                    .name(ERole.ROLE_RECRUITER)
                     .build();
 
             if (!roleService.checkIfExistsByName(candidateRole.getName())) {

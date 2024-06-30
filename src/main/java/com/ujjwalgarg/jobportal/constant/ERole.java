@@ -5,7 +5,7 @@ package com.ujjwalgarg.jobportal.constant;
  */
 public enum ERole {
 
-    CANDIDATE,
-    RECRUITER;
+    ROLE_CANDIDATE,
+    ROLE_RECRUITER;
 
 }
