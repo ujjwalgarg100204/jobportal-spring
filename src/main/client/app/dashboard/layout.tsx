@@ -4,8 +4,15 @@ import { redirect } from "next/navigation";
 import DashboardNavbar from "./dashboard-navbar";
 
 import { getServerSession } from "@/service/auth";
-import { getCandidateProfileById } from "@/service/candidate-profile";
-import { getRecruiterProfileById } from "@/service/recruiter-profile";
+import {
+    getCandidateProfileById,
+    getCandidateProfilePhotoUrl,
+} from "@/service/candidate-profile";
+import {
+    getCurrentRecruiterProfile,
+    getRecruiterProfilePhotoUrl,
+} from "@/service/recruiter-profile";
+import { ERole } from "@/type/constants";
 
 type Props = {
     children: ReactNode;
@@ -18,12 +25,25 @@ export default async function DashboardLayout({ children }: Readonly<Props>) {
     }
 
     const profileResponse =
-        session.user.role === "CANDIDATE"
+        session.user.role === ERole.CANDIDATE
             ? await getCandidateProfileById(session.user.id)
-            : await getRecruiterProfileById(session.user.id);
+            : await getCurrentRecruiterProfile();
 
     if (!profileResponse.success) {
         throw new Error("Unable to fetch user profile");
+    }
+
+    let profilePhotoUrl: string | undefined = undefined;
+
+    if (profileResponse.data.hasProfilePhoto) {
+        const profilePhotoResponse =
+            session.user.role === ERole.CANDIDATE
+                ? await getCandidateProfilePhotoUrl()
+                : await getRecruiterProfilePhotoUrl();
+
+        if (profilePhotoResponse.success) {
+            profilePhotoUrl = profilePhotoResponse.data;
+        }
     }
 
     return (
@@ -35,7 +55,7 @@ export default async function DashboardLayout({ children }: Readonly<Props>) {
                     role: session.user.role,
                     firstName: profileResponse.data.firstName,
                     lastName: profileResponse.data.lastName,
-                    hasProfilePhoto: profileResponse.data.hasProfilePhoto,
+                    profilePhotoUrl,
                 }}
             />
             <div className="px-4 md:px-8 lg:px-24 xl:px-32 mt-4">

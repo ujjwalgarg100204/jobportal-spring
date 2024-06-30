@@ -1,8 +1,8 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { redirect } from "next/navigation";
 
 import {
     loginUser,

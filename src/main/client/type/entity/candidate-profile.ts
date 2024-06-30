@@ -1,4 +1,4 @@
-import { EmploymentType } from "../constants";
+import { ERole, EmploymentType, WorkAuthorization } from "../constants";
 
 import { Address } from "./address";
 import { ContactInformation } from "./contact-information";
@@ -16,6 +16,7 @@ export type CandidateProfile = {
     hasProfilePhoto: boolean;
     hasResume: boolean;
     preferredEmploymentType?: EmploymentType;
+    workAuthorization?: WorkAuthorization;
     user: User;
     address?: Address;
     contactInformation: ContactInformation;
@@ -26,13 +27,30 @@ export type CandidateProfile = {
 
 export type NavbarRequiredCandidateProfileDetails = Pick<
     CandidateProfile,
-    "firstName" | "lastName" | "hasProfilePhoto"
+    "firstName" | "lastName"
 > & {
-    role: "CANDIDATE";
+    role: ERole.CANDIDATE;
     email: User["email"];
     id: Required<CandidateProfile>["id"];
+    profilePhotoUrl?: string;
 };
 
 export type GetCandidateProfileByIdResponse = {
     id: Required<CandidateProfile>["id"];
 } & Omit<CandidateProfile, "user">;
+
+export type UpdateCandidateProfileRequest = Pick<
+    CandidateProfile,
+    | "firstName"
+    | "lastName"
+    | "shortAbout"
+    | "about"
+    | "preferredEmploymentType"
+    | "workAuthorization"
+    | "address"
+    | "contactInformation"
+    | "educations"
+    | "interests"
+> & {
+    skills?: Omit<Skill, "candidateProfile">[];
+};

@@ -95,8 +95,6 @@ export async function getServerSession(): Promise<Session> {
         return response.data;
     }
 
-    await logout();
-
     return null;
 }
 

@@ -1,10 +1,10 @@
-import { Link } from "@nextui-org/link";
-import NextLink from "next/link";
 import { RedirectType, redirect } from "next/navigation";
 
 import LoginForm from "./login-form";
 
 import { getServerSession } from "@/service/auth";
+import NextLink from "@/lib/next-ui/link";
+
 export default async function LoginPage() {
     const session = await getServerSession();
 
@@ -22,13 +22,9 @@ export default async function LoginPage() {
                 <LoginForm />
                 <p className="text-center mt-4">
                     Are you a new user?{" "}
-                    <Link
-                        as={NextLink}
-                        href="/auth/register"
-                        underline="always"
-                    >
+                    <NextLink href="/auth/register" underline="always">
                         Register Now
-                    </Link>
+                    </NextLink>
                 </p>
             </section>
         </>

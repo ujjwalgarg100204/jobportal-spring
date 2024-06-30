@@ -1,3 +1,3 @@
 export default function RecruiterDashboardPage() {
-    return <h2>This is recruiter Dashboard Page</h2>;
+    return <h2>Recruiter Dashboard Page</h2>;
 }

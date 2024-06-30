@@ -1,16 +1,15 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
 
 import { loginAction } from "@/action/auth";
 import FormError from "@/component/form-error";
 import useNavigationWithToast from "@/hook/useNavigationWithToast";
+import FormSubmitButton from "@/component/form-submit-button";
 
 export default function LoginForm() {
     const [state, formAction] = useFormState(loginAction, null);
-    const { pending } = useFormStatus();
 
     useNavigationWithToast(state, "/dashboard");
 
@@ -33,14 +32,9 @@ export default function LoginForm() {
                     type="password"
                 />
             </div>
-            <Button
-                fullWidth
-                className="bg-primary font-semibold"
-                isLoading={pending}
-                type="submit"
-            >
+            <FormSubmitButton fullWidth className="bg-primary font-semibold">
                 Login
-            </Button>
+            </FormSubmitButton>
         </form>
     );
 }

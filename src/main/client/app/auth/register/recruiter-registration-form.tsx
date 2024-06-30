@@ -1,16 +1,15 @@
 "use client";
 
-import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
-import { useFormState, useFormStatus } from "react-dom";
+import { useFormState } from "react-dom";
 
 import { registerNewRecruiterAction } from "@/action/auth";
 import FormError from "@/component/form-error";
 import useNavigationWithToast from "@/hook/useNavigationWithToast";
+import FormSubmitButton from "@/component/form-submit-button";
 
 export default function RecruiterRegistrationForm() {
     const [state, formAction] = useFormState(registerNewRecruiterAction, null);
-    const { pending } = useFormStatus();
 
     useNavigationWithToast(state, "/auth/login");
 
@@ -80,14 +79,9 @@ export default function RecruiterRegistrationForm() {
                     />
                 </fieldset>
             </fieldset>
-            <Button
-                fullWidth
-                className="bg-primary font-semibold"
-                isLoading={pending}
-                type="submit"
-            >
+            <FormSubmitButton fullWidth className="bg-primary font-semibold">
                 Register
-            </Button>
+            </FormSubmitButton>
         </form>
     );
 }

@@ -1,7 +1,6 @@
-import { Link } from "@nextui-org/link";
-import NextLink from "next/link";
-
 import RegisterForm from "./register-form";
+
+import NextLink from "@/lib/next-ui/link";
 
 export default function RegisterPage() {
     return (
@@ -14,13 +13,9 @@ export default function RegisterPage() {
                 <RegisterForm />
                 <p className="text-center mt-4">
                     Already a user?{" "}
-                    <Link
-                        as={NextLink}
-                        href="/auth/register"
-                        underline="always"
-                    >
+                    <NextLink href="/auth/register" underline="always">
                         Login
-                    </Link>
+                    </NextLink>
                 </p>
             </section>
         </>

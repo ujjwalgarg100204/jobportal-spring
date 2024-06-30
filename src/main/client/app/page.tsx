@@ -1,18 +1,21 @@
-import { MdLocationPin } from "react-icons/md";
-import { FaSearch } from "react-icons/fa";
+import { Button } from "@nextui-org/button";
+import { Input } from "@nextui-org/input";
 import {
     Navbar,
     NavbarBrand,
     NavbarContent,
     NavbarItem,
 } from "@nextui-org/navbar";
-import { Link } from "@nextui-org/link";
-import { Button } from "@nextui-org/button";
-import { Input } from "@nextui-org/input";
+import { FaSearch } from "react-icons/fa";
+import { MdLocationPin } from "react-icons/md";
 
 import Logo from "@/component/logo";
+import NextLink from "@/lib/next-ui/link";
+import { getServerSession } from "@/service/auth";
 
-export default function IndexPage() {
+export default async function IndexPage() {
+    const session = await getServerSession();
+
     return (
         <main className="min-h-screen w-screen">
             <Navbar>
@@ -20,33 +23,49 @@ export default function IndexPage() {
                     <Logo />
                 </NavbarBrand>
                 <NavbarContent justify="end">
-                    <NavbarItem>
-                        <Button
-                            as={Link}
-                            className="px-3 min-w-16 h-8 text-tiny rounded-small md:px-4 md:min-w-20 md:h-10 md:text-small md:rounded-medium"
-                            color="primary"
-                            href="/auth/login"
-                        >
-                            Login
-                        </Button>
-                    </NavbarItem>
-                    <NavbarItem>
-                        <Button
-                            as={Link}
-                            className="px-3 min-w-16 h-8 text-tiny rounded-small md:px-4 md:min-w-20 md:h-10 md:text-small md:rounded-medium"
-                            color="primary"
-                            href="/auth/register"
-                            variant="flat"
-                        >
-                            Register
-                        </Button>
-                    </NavbarItem>
+                    {session ? (
+                        <NavbarItem>
+                            <Button
+                                as={NextLink}
+                                className="px-3 min-w-16 h-8 text-tiny rounded-small md:px-4 md:min-w-20 md:h-10 md:text-small md:rounded-medium"
+                                color="primary"
+                                href="/dashboard"
+                            >
+                                Dashboard
+                            </Button>
+                        </NavbarItem>
+                    ) : (
+                        <>
+                            <NavbarItem>
+                                <Button
+                                    as={NextLink}
+                                    className="px-3 min-w-16 h-8 text-tiny rounded-small md:px-4 md:min-w-20 md:h-10 md:text-small md:rounded-medium"
+                                    color="primary"
+                                    href="/auth/login"
+                                >
+                                    Login
+                                </Button>
+                            </NavbarItem>
+                            <NavbarItem>
+                                <Button
+                                    as={NextLink}
+                                    className="px-3 min-w-16 h-8 text-tiny rounded-small md:px-4 md:min-w-20 md:h-10 md:text-small md:rounded-medium"
+                                    color="primary"
+                                    href="/auth/register"
+                                    variant="flat"
+                                >
+                                    Register
+                                </Button>
+                            </NavbarItem>
+                        </>
+                    )}
                 </NavbarContent>
             </Navbar>
 
-            <section className="text-center p-4 mt-28 space-y-6 max-w-3xl mx-auto md:p-0 md:space-y-12 lg:space-y-16">
+            <section className="text-center p-4 mt-40 space-y-6 max-w-3xl mx-auto md:p-0 md:space-y-12 lg:space-y-16">
                 <h1 className="font-bold text-3xl md:text-4xl lg:text-5xl">
-                    Find Your Dream <br /> Job in your Dream Field
+                    Find Your Dream Job <br className="my-1" />
+                    in your Dream Field
                 </h1>
                 <form className="grid grid-cols-2 gap-x-2 gap-y-6 md:gap-x-4">
                     <Input

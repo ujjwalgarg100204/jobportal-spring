@@ -10,7 +10,7 @@ import RecruiterRegistrationForm from "./recruiter-registration-form";
 import { ERole } from "@/type/constants";
 
 export default function RegisterForm() {
-    const [userRole, setUserRole] = useState<ERole>("CANDIDATE");
+    const [userRole, setUserRole] = useState<ERole>(ERole.CANDIDATE);
 
     return (
         <section className="w-full space-y-6">
@@ -28,8 +28,8 @@ export default function RegisterForm() {
                             "data-[selected=true]:border-primary",
                         ),
                     }}
-                    defaultChecked={userRole === "CANDIDATE"}
-                    value="CANDIDATE"
+                    defaultChecked={userRole === ERole.CANDIDATE}
+                    value={ERole.CANDIDATE}
                 >
                     Candidate
                 </Radio>
@@ -41,13 +41,13 @@ export default function RegisterForm() {
                             "data-[selected=true]:border-primary",
                         ),
                     }}
-                    defaultChecked={userRole === "RECRUITER"}
-                    value="RECRUITER"
+                    defaultChecked={userRole === ERole.RECRUITER}
+                    value={ERole.RECRUITER}
                 >
                     Recruiter
                 </Radio>
             </RadioGroup>
-            {userRole === "CANDIDATE" ? (
+            {userRole === ERole.CANDIDATE ? (
                 <CandidateRegistrationForm />
             ) : (
                 <RecruiterRegistrationForm />

@@ -1,55 +1,39 @@
 "use client";
 
 import { Button } from "@nextui-org/button";
-import { Link } from "@nextui-org/link";
+import {
+    Dropdown,
+    DropdownItem,
+    DropdownMenu,
+    DropdownTrigger,
+} from "@nextui-org/dropdown";
 import {
     Navbar,
     NavbarBrand,
     NavbarContent,
     NavbarItem,
     NavbarMenu,
-    NavbarMenuItem,
     NavbarMenuToggle,
 } from "@nextui-org/navbar";
 import { User } from "@nextui-org/user";
-import { usePathname } from "next/navigation";
-import React from "react";
+import { usePathname, useRouter } from "next/navigation";
+import React, { Key } from "react";
 import {
+    FaAngleDown,
+    FaExternalLinkAlt,
     FaEye,
     FaFileArchive,
-    FaPencilAlt,
     FaSearch,
     FaUser,
 } from "react-icons/fa";
 
 import { logoutAction } from "@/action/auth";
+import FormSubmitButton from "@/component/form-submit-button";
 import Logo from "@/component/logo";
+import NextLink from "@/lib/next-ui/link";
+import { ERole } from "@/type/constants";
 import { NavbarRequiredCandidateProfileDetails } from "@/type/entity/candidate-profile";
 import { NavbarRequiredRecruiterProfileDetails } from "@/type/entity/recruiter-profile";
-import { env } from "@/utils/env";
-
-const candidateNavbarItems = [
-    { icon: <FaSearch />, text: "Search for Jobs", href: "/dashboard/j" },
-    { icon: <FaEye />, text: "View saved jobs", href: "/dashboard/saved-jobs" },
-    {
-        icon: <FaPencilAlt />,
-        text: "Edit Profile",
-        href: "/dashboard/edit-profile",
-    },
-] as const;
-const recruiterNavbarItems = [
-    {
-        icon: <FaFileArchive />,
-        text: "Post new Job",
-        href: "/dashboard/add-job",
-    },
-    { icon: <FaEye />, text: "View your jobs", href: "/dashboard/r" },
-    {
-        icon: <FaPencilAlt />,
-        text: "Edit Account",
-        href: "/dashboard/edit-account",
-    },
-] as const;
 
 export type Props = {
     profile:
@@ -60,15 +44,12 @@ export type Props = {
 export default function DashboardNavbar({ profile }: Readonly<Props>) {
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const path = usePathname();
-    const navbarItems =
-        profile.role === "CANDIDATE"
-            ? candidateNavbarItems
-            : recruiterNavbarItems;
 
     return (
         <Navbar
             classNames={{
-                wrapper: "lg:gap-12 xl:gap-20 2xl:gap-32 items-center",
+                wrapper:
+                    "lg:gap-12 xl:gap-20 2xl:gap-32 items-center w-full max-w-full xl:px-32",
             }}
             onMenuOpenChange={setIsMenuOpen}
         >
@@ -78,30 +59,23 @@ export default function DashboardNavbar({ profile }: Readonly<Props>) {
                     className="md:hidden"
                 />
                 <NavbarBrand>
-                    <Logo />
+                    <Logo href="/dashboard" />
                 </NavbarBrand>
             </NavbarContent>
 
             <NavbarContent className="hidden md:flex gap-4" justify="center">
-                {navbarItems.map(item => (
-                    <NavbarItem key={item.text}>
-                        <Button
-                            as={Link}
-                            color={path === item.href ? "primary" : "secondary"}
-                            href={item.href}
-                            startContent={item.icon}
-                        >
-                            {item.text}
-                        </Button>
-                    </NavbarItem>
-                ))}
+                {profile.role === ERole.CANDIDATE ? (
+                    <CandidateNavbarItems path={path} />
+                ) : (
+                    <RecruiterNavbarItems path={path} />
+                )}
             </NavbarContent>
             <NavbarContent justify="end">
                 <NavbarItem>
                     <User
                         avatarProps={{
-                            src: getProfilePhotoUrl(profile),
-                            name: getAvatarName(profile),
+                            src: profile.profilePhotoUrl,
+                            name: `${profile.firstName} ${profile.lastName}`,
                             fallback: <FaUser />,
                             showFallback: true,
                         }}
@@ -110,51 +84,162 @@ export default function DashboardNavbar({ profile }: Readonly<Props>) {
                             description: "hidden md:block",
                         }}
                         description={profile.email}
-                        name={getAvatarName(profile)}
+                        name={`${profile.firstName} ${profile.lastName}`}
                     />
                 </NavbarItem>
                 <NavbarItem>
                     <form action={logoutAction}>
-                        <Button color="primary" type="submit" variant="flat">
+                        <FormSubmitButton color="primary" variant="flat">
                             Logout
-                        </Button>
+                        </FormSubmitButton>
                     </form>
                 </NavbarItem>
             </NavbarContent>
             <NavbarMenu>
-                {navbarItems.map((item, index) => (
-                    <NavbarMenuItem key={`${item.text}-${index}`}>
-                        <Button
-                            as={Link}
-                            className="w-full"
-                            color="primary"
-                            href={item.href}
-                            size="lg"
-                            startContent={item.icon}
-                        >
-                            {item.text}
-                        </Button>
-                    </NavbarMenuItem>
-                ))}
+                {profile.role === ERole.CANDIDATE ? (
+                    <CandidateNavbarItems path={path} />
+                ) : (
+                    <RecruiterNavbarItems path={path} />
+                )}
             </NavbarMenu>
         </Navbar>
     );
 }
 
-function getProfilePhotoUrl(profile: Props["profile"]): string | undefined {
-    if (profile.hasProfilePhoto) {
-        return `${env.API_BASE_URL}/recruiter/profile/photo`;
+function CandidateNavbarItems({ path }: { path: string }) {
+    const router = useRouter();
+
+    function handleDrowdownAction(key: Key) {
+        switch (key) {
+            case "applied-jobs":
+                return router.push("/dashboard/c/job/applied");
+            case "bookmarked-jobs":
+                return router.push("/dashboard/c/job/bookmarked");
+            case "all-jobs":
+                return router.push("/dashboard/c/job");
+        }
     }
+
+    return (
+        <>
+            <NavbarItem>
+                <Button
+                    as={NextLink}
+                    color={
+                        path === "/dashboard/c/job/search"
+                            ? "primary"
+                            : "secondary"
+                    }
+                    href="/dashboard/c/job/search"
+                    startContent={<FaSearch />}
+                >
+                    Search for Jobs
+                </Button>
+            </NavbarItem>
+            <NavbarItem>
+                <Dropdown>
+                    <DropdownTrigger>
+                        <Button
+                            color={
+                                path.startsWith("/dashboard/c/job/") &&
+                                path !== "/dashboard/c/job/search"
+                                    ? "primary"
+                                    : "secondary"
+                            }
+                            endContent={<FaAngleDown />}
+                        >
+                            More on Jobs
+                        </Button>
+                    </DropdownTrigger>
+                    <DropdownMenu
+                        aria-label="Static Actions"
+                        onAction={handleDrowdownAction}
+                    >
+                        <DropdownItem
+                            key="applied-jobs"
+                            endContent={<FaExternalLinkAlt />}
+                        >
+                            Applied Jobs
+                        </DropdownItem>
+                        <DropdownItem
+                            key="bookmarked-jobs"
+                            endContent={<FaExternalLinkAlt />}
+                        >
+                            Bookmarked Jobs
+                        </DropdownItem>
+                        <DropdownItem
+                            key="all-jobs"
+                            endContent={<FaExternalLinkAlt />}
+                        >
+                            All Jobs
+                        </DropdownItem>
+                    </DropdownMenu>
+                </Dropdown>
+            </NavbarItem>
+            <NavbarItem>
+                <Button
+                    as={NextLink}
+                    color={
+                        path.startsWith("/dashboard/c/profile")
+                            ? "primary"
+                            : "secondary"
+                    }
+                    href="/dashboard/c/profile"
+                    startContent={<FaUser />}
+                >
+                    Your Profile
+                </Button>
+            </NavbarItem>
+        </>
+    );
 }
 
-function getAvatarName(profile: Props["profile"]): string {
-    let name = profile.email.substring(0, profile.email.indexOf("@"));
-
-    if (profile.firstName) {
-        name = profile.firstName;
-    } else if (!!profile.firstName && !!profile.lastName) {
-        name = `${profile.firstName} ${profile.lastName}`;
-    }
-
-    return name;
+function RecruiterNavbarItems({ path }: { path: string }) {
+    return (
+        <>
+            <NavbarItem>
+                <Button
+                    as={NextLink}
+                    color={
+                        path === "/dashboard/r/job/create"
+                            ? "primary"
+                            : "secondary"
+                    }
+                    href="/dashboard/r/job/create"
+                    startContent={<FaFileArchive />}
+                >
+                    Post New Job
+                </Button>
+            </NavbarItem>
+            <NavbarItem>
+                <Button
+                    as={NextLink}
+                    color={
+                        path.startsWith("/dashboard/r/job") &&
+                        path !== "/dashboard/r/job/create"
+                            ? "primary"
+                            : "secondary"
+                    }
+                    href="/dashboard/r/job"
+                    startContent={<FaEye />}
+                >
+                    View Your Jobs
+                </Button>
+            </NavbarItem>
+            <NavbarItem>
+                <Button
+                    as={NextLink}
+                    color={
+                        path.startsWith("/dashboard/r/profile")
+                            ? "primary"
+                            : "secondary"
+                    }
+                    href="/dashboard/r/profile"
+                    startContent={<FaUser />}
+                >
+                    Your Profile
+                </Button>
+            </NavbarItem>
+        </>
+    );
 }
