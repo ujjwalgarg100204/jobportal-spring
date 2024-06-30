@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -43,7 +44,7 @@ public class Skill {
     @Column(name = "years_of_experience", nullable = false)
     private String yearsOfExperience;
 
-    @NotBlank(message = "Experience level of skill is mandatory")
+    @NotNull(message = "Experience level of skill is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(name = "experience_level", nullable = false)
     private ExperienceLevel experienceLevel;
