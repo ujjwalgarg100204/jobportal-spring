@@ -74,4 +74,7 @@ public class RecruiterProfile {
     @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "recruiterProfile")
+    private List<Job> jobs;
+
 }

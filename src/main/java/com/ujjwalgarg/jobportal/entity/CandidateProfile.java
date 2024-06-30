@@ -6,6 +6,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.URL;
 
 import com.ujjwalgarg.jobportal.constant.EmploymentType;
+import com.ujjwalgarg.jobportal.constant.WorkAuthorization;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -21,6 +22,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -67,10 +69,14 @@ public class CandidateProfile {
     private String portfolioWebsite;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "work_authorization")
+    private WorkAuthorization workAuthorization;
+
+    @Enumerated(EnumType.STRING)
     @Column(name = "preferred_employment_type")
     private EmploymentType preferredEmploymentType;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, optional = false, fetch = FetchType.EAGER)
     @MapsId
     private User user;
 
@@ -78,6 +84,7 @@ public class CandidateProfile {
     @JoinColumn(name = "address_id", referencedColumnName = "id")
     private Address address;
 
+    @NotNull(message = "Contact Information is mandatory")
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "contact_information_id", referencedColumnName = "id")
     private ContactInformation contactInformation;
@@ -92,5 +99,8 @@ public class CandidateProfile {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateProfile")
     private List<Skill> skills;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateProfile")
+    private List<CandidateBookmarkedJob> candidateBookmarkedJobs;
 
 }
