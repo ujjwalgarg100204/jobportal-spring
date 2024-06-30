@@ -1,6 +1,5 @@
 package com.ujjwalgarg.jobportal.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,10 +33,12 @@ import com.ujjwalgarg.jobportal.service.UserService;
 
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 /**
  * AuthController
  */
+@RequiredArgsConstructor
 @RestController
 @RequestMapping(value = "/api/auth", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
@@ -46,15 +47,6 @@ public class AuthController {
     private final UserService userService;
     private final PasswordEncoder encoder;
     private final JwtUtils jwtUtils;
-
-    @Autowired
-    public AuthController(AuthenticationManager authenticationManager, UserService userService,
-            PasswordEncoder encoder, JwtUtils jwtUtils) {
-        this.authenticationManager = authenticationManager;
-        this.userService = userService;
-        this.encoder = encoder;
-        this.jwtUtils = jwtUtils;
-    }
 
     @PostMapping("/login")
     public ResponseEntity<Response<LoginResponse>> authenticateUser(
@@ -66,7 +58,7 @@ public class AuthController {
         var response = Response.<LoginResponse>builder()
                 .success(true)
                 .data(new LoginResponse(jwt))
-                .message("Succesfully logged in user with email %s".formatted(loginRequest.email()))
+                .message("Successfully logged in user with email %s".formatted(loginRequest.email()))
                 .build();
 
         return ResponseEntity.ok(response);
