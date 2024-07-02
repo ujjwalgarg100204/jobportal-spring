@@ -15,7 +15,7 @@ export async function getAllJobsOfRecruiterWithApplicantCount() {
         jsonRequest: true,
         next: {
             tags: ["job"],
-            revalidate: 1000 * 60 * 5,
+            revalidate: 60 * 5,
         },
     });
 

@@ -19,7 +19,7 @@ export enum ExperienceLevel {
 export enum RemoteType {
     REMOTE_ONLY = "REMOTE_ONLY",
     OFFICE_ONLY = "OFFICE_ONLY",
-    PARTIAl_REMOTE = "PARTIAl_REMOTE",
+    PARTIAL_REMOTE = "PARTIAL_REMOTE",
 }
 
 export enum WorkAuthorization {

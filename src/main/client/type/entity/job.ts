@@ -2,7 +2,10 @@ import { EmploymentType, RemoteType } from "../constants";
 
 import { Address } from "./address";
 import { Company } from "./company";
-import { RecruiterProfile } from "./recruiter-profile";
+import {
+    GetRecruiterProfileByIdResponse,
+    RecruiterProfile,
+} from "./recruiter-profile";
 
 export type Job = {
     id?: number;
@@ -17,6 +20,12 @@ export type Job = {
     company: Company;
     hiringComplete: boolean;
     createdAt: string;
+};
+
+export type GetJobByIdResponse = Omit<Job, "id" | "recruiter" | "company"> & {
+    id: Required<Job>["id"];
+    recruiter: GetRecruiterProfileByIdResponse;
+    company: Company;
 };
 
 export type GetRecruiterJobsResponse = Omit<Job, "id" | "company"> & {

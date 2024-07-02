@@ -2,12 +2,13 @@
 
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { RedirectType, redirect } from "next/navigation";
 
+import { createNewJob, deleteJobById, updateJob } from "@/service/job";
 import { ActionResponse } from "@/type/backend-communication";
-import { handleActionLevelError } from "@/utils/error";
-import { CreateNewJobRequest, UpdateJobRequest } from "@/type/entity/job";
 import { EmploymentType, RemoteType } from "@/type/constants";
-import { createNewJob, updateJob } from "@/service/job";
+import { CreateNewJobRequest, UpdateJobRequest } from "@/type/entity/job";
+import { handleActionLevelError } from "@/utils/error";
 
 export async function createNewJobAction(
     _: ActionResponse<null>,
@@ -71,7 +72,7 @@ export async function updateJobAction(
                 salary: z.string(),
                 employmentType: z.nativeEnum(EmploymentType),
                 remoteType: z.nativeEnum(RemoteType),
-                noOfVacancy: z.number(),
+                noOfVacancy: z.coerce.number(),
                 address: z.object({
                     id: z.coerce.number().optional(),
                     city: z.string().optional(),

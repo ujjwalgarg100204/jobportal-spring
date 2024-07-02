@@ -139,13 +139,14 @@ export default function JobCreateUpdateForm({ defaultValues }: Props) {
                             Office-Only
                         </SelectItem>
                         <SelectItem
-                            key={RemoteType.PARTIAl_REMOTE}
-                            value={RemoteType.PARTIAl_REMOTE}
+                            key={RemoteType.PARTIAL_REMOTE}
+                            value={RemoteType.PARTIAL_REMOTE}
                         >
                             Partial-Remote
                         </SelectItem>
                     </Select>
                     <Input
+                        defaultValue={defaultValues?.salary}
                         label="Salary"
                         name="salary"
                         type="text"

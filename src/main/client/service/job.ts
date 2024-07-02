@@ -1,8 +1,13 @@
 "use server";
 
-import { UpdateJobRequest } from "@/type/entity/job";
-import { CreateNewJobRequest } from "@/type/entity/job";
-import { patch, post } from "@/utils/backend";
+import { revalidateTag } from "next/cache";
+
+import {
+    CreateNewJobRequest,
+    GetJobByIdResponse,
+    UpdateJobRequest,
+} from "@/type/entity/job";
+import { deletee, get, patch, post } from "@/utils/backend";
 import { logger } from "@/utils/logger";
 
 const BASE_URL = "/job";
@@ -15,9 +20,14 @@ export async function createNewJob(data: CreateNewJobRequest) {
     });
 
     if (response.success) {
-        logger.info(`Successfully created new job, response:${response}`);
+        logger.info(
+            `Successfully created new job, response:${JSON.stringify(response)}`,
+        );
+        revalidateTag("job");
     } else {
-        logger.error(`Failed to create new job, response:${response}`);
+        logger.error(
+            `Failed to create new job, response:${JSON.stringify(response)}`,
+        );
     }
 
     return response;
@@ -31,9 +41,34 @@ export async function updateJob(data: UpdateJobRequest) {
     });
 
     if (response.success) {
-        logger.info(`Successfully updated job, response:${response}`);
+        logger.info(
+            `Successfully updated job, response:${JSON.stringify(response)}`,
+        );
+        revalidateTag("job");
     } else {
-        logger.error(`Failed to update job, response:${response}`);
+        logger.error(
+            `Failed to update job, response:${JSON.stringify(response)}`,
+        );
+    }
+
+    return response;
+}
+
+export async function getJobById(id: number | string) {
+    const response = await get<GetJobByIdResponse>(`${BASE_URL}/${id}`, {
+        authenticatedRequest: true,
+        jsonRequest: true,
+        next: { tags: ["job"] },
+    });
+
+    if (response.success) {
+        logger.info(
+            `Successfully fetched job by id, response:${JSON.stringify(response)}`,
+        );
+    } else {
+        logger.error(
+            `Failed to fetch job by id, response:${JSON.stringify(response)}`,
+        );
     }
 
     return response;
