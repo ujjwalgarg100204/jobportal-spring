@@ -5,7 +5,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.ujjwalgarg.jobportal.controller.payload.Response;
 import com.ujjwalgarg.jobportal.controller.payload.request.CreateNewJobRequest;
 import com.ujjwalgarg.jobportal.controller.payload.request.UpdateJobRequest;
+import com.ujjwalgarg.jobportal.controller.payload.response.GetJobByIdResponse;
 import com.ujjwalgarg.jobportal.entity.Job;
 import com.ujjwalgarg.jobportal.entity.RecruiterProfile;
 import com.ujjwalgarg.jobportal.entity.User;
@@ -81,6 +84,18 @@ public class JobController {
                 .build();
 
         return new ResponseEntity<>(response, HttpStatus.CREATED);
+    }
+
+    @Transactional(readOnly = true)
+    @GetMapping(value = "/{id}", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<Response<GetJobByIdResponse>> getJobByIdResponse(@PathVariable("id") Integer id) {
+        Job job = jobService.getJobById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Job not found"));
+
+        var response = Response.success(
+                jobService.getMapper().toGetJobByIdResponse(job),
+                "Job retrieved successfully");
+        return ResponseEntity.ok(response);
     }
 
 }
