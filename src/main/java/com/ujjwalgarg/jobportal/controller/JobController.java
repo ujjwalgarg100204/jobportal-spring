@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -95,6 +96,15 @@ public class JobController {
         var response = Response.success(
                 jobService.getMapper().toGetJobByIdResponse(job),
                 "Job retrieved successfully");
+        return ResponseEntity.ok(response);
+    }
+
+    @Transactional
+    @DeleteMapping(value = "/{id}", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<Response<Void>> deleteJobById(@PathVariable("id") Integer id) {
+        jobService.deleteJobById(id);
+
+        var response = Response.<Void>success(null, "Job deleted successfully");
         return ResponseEntity.ok(response);
     }
 

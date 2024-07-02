@@ -27,6 +27,9 @@ export default async function AllJobsOfRecruiterPage() {
                 Your Jobs
             </h1>
             <ul className="flex flex-wrap gap-8 items-center justify-center">
+                {jobs.length === 0 && (
+                    <li>Jobs created by you will show up here</li>
+                )}
                 {jobs.map(job => (
                     <li key={job.id}>
                         <JobCard

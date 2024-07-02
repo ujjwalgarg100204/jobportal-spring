@@ -73,3 +73,23 @@ export async function getJobById(id: number | string) {
 
     return response;
 }
+
+export async function deleteJobById(id: number | string) {
+    const response = await deletee<null>(`${BASE_URL}/${id}`, {
+        authenticatedRequest: true,
+        jsonRequest: true,
+    });
+
+    if (response.success) {
+        revalidateTag("job");
+        logger.info(
+            `Successfully deleted job by id, response:${JSON.stringify(response)}`,
+        );
+    } else {
+        logger.error(
+            `Failed to delete by id, response:${JSON.stringify(response)}`,
+        );
+    }
+
+    return response;
+}

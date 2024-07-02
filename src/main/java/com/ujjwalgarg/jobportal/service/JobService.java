@@ -42,4 +42,8 @@ public class JobService {
         return jobMapper;
     }
 
+    public void deleteJobById(int id) {
+        jobRepository.deleteById(id);
+    }
+
 }

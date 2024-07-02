@@ -112,3 +112,19 @@ export async function updateJobAction(
         return handleActionLevelError(e);
     }
 }
+
+export async function deleteJobAction(
+    _: ActionResponse<null>,
+    formData: FormData,
+) {
+    try {
+        const response = await deleteJobById(String(formData.get("id")));
+
+        if (response.success) {
+            redirect("/dashboard/r/job", RedirectType.replace);
+        }
+        throw new Error(response.message);
+    } catch (e) {
+        return handleActionLevelError(e);
+    }
+}
