@@ -23,6 +23,7 @@ import com.ujjwalgarg.jobportal.entity.RecruiterProfile;
 import com.ujjwalgarg.jobportal.entity.User;
 import com.ujjwalgarg.jobportal.exception.EntityNotFoundException;
 import com.ujjwalgarg.jobportal.security.services.AuthService;
+import com.ujjwalgarg.jobportal.service.CandidateJobApplicationService;
 import com.ujjwalgarg.jobportal.service.JobService;
 import com.ujjwalgarg.jobportal.service.RecruiterProfileService;
 
@@ -40,6 +41,7 @@ public class JobController {
     private final AuthService authService;
     private final JobService jobService;
     private final RecruiterProfileService rProfileService;
+    private final CandidateJobApplicationService cJobAppService;
 
     @Transactional
     @PreAuthorize("hasRole('ROLE_RECRUITER')")
@@ -92,9 +94,10 @@ public class JobController {
     public ResponseEntity<Response<GetJobByIdResponse>> getJobByIdResponse(@PathVariable("id") Integer id) {
         Job job = jobService.getJobById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Job not found"));
+        int applyCount = cJobAppService.getJobApplicationCountsByJobId(job.getId());
 
         var response = Response.success(
-                jobService.getMapper().toGetJobByIdResponse(job),
+                jobService.getMapper().toGetJobByIdResponse(job, applyCount),
                 "Job retrieved successfully");
         return ResponseEntity.ok(response);
     }

@@ -101,6 +101,9 @@ public class CandidateProfile {
     private List<Skill> skills;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateProfile")
-    private List<CandidateBookmarkedJob> candidateBookmarkedJobs;
+    private List<CandidateJobApplication> jobApplications;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "candidateProfile")
+    private List<CandidateBookmarkedJob> bookmarkedJobs;
 
 }

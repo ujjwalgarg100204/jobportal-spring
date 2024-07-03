@@ -2,11 +2,11 @@ import { nextui } from "@nextui-org/theme";
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: [
-        "./component/**/*.{js,ts,jsx,tsx,mdx}",
-        "./app/**/*.{js,ts,jsx,tsx,mdx}",
-        "./node_modules/@nextui-org/theme/dist/components/(avatar|button|card|checkbox|code|dropdown|input|kbd|link|listbox|navbar|radio|select|snippet|spinner|toggle|user|ripple|menu|divider|popover|scroll-shadow).js",
-    ],
+  content: [
+    "./component/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./node_modules/@nextui-org/theme/dist/components/(avatar|button|card|checkbox|code|dropdown|input|kbd|link|listbox|navbar|radio|select|snippet|spinner|toggle|popover|user|ripple|menu|divider|scroll-shadow).js"
+  ],
     theme: {
         extend: {
             colors: {

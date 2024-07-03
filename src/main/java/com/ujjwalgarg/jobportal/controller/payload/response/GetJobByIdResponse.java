@@ -26,5 +26,6 @@ public class GetJobByIdResponse {
     private GetRecruiterProfileByIdResponse recruiterProfile;
     private Address address;
     private CompanyDTOResponse company;
+    private Integer noOfAppliedCandidates;
 
 }

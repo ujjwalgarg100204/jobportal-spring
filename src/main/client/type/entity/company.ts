@@ -1,10 +1,14 @@
 import { Address } from "./address";
+import { Job } from "./job";
+import { RecruiterProfile } from "./recruiter-profile";
 
 export type Company = {
     id?: number;
     name: string;
     hasLogo: boolean;
     address?: Address;
+    recruiterProfiles?: RecruiterProfile[];
+    jobs: Job[];
 };
 
 export type GetCompanyOfCurrentRecruiterResponse = Omit<Company, "id"> & {

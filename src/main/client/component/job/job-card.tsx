@@ -7,6 +7,7 @@ import JobActions, { Props as JobActionsProps } from "./job-actions";
 import { GetRecruiterJobsResponse } from "@/type/entity/job";
 import { Company } from "@/type/entity/company";
 import { ERole } from "@/type/constants";
+import NextLink from "@/lib/next-ui/link";
 
 type Props = {
     job: GetRecruiterJobsResponse & { company: Company };
@@ -18,7 +19,14 @@ export default function JobCard({ job, actionProps }: Props) {
         <Card className="max-w-[340px]">
             <CardHeader className="flex gap-3">
                 <div className="flex flex-col gap-1">
-                    <p className="text-lg font-semibold">{job.title}</p>
+                    <NextLink
+                        showAnchorIcon
+                        className="text-lg font-semibold"
+                        href={`/dashboard/${actionProps.role === ERole.CANDIDATE ? "c" : "r"}/job/${job.id}`}
+                        underline="hover"
+                    >
+                        {job.title}
+                    </NextLink>
                     <p className="text-small text-default-500 flex items-center gap-2">
                         <FaBuilding className="size-4" /> {job.company.name}
                     </p>

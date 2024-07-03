@@ -21,3 +21,5 @@ export type RequestConfig = Omit<RequestInit, "method"> & {
 export type HttpVerb = "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
 
 export type ActionResponse<Data> = BackendResponse<Data> | null;
+
+export type Id = string | number;

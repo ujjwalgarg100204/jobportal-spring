@@ -18,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 public class CandidateProfileService {
 
     private final CandidateProfileRepository candidateProfileRepository;
+    private final CandidateJobApplicationService cJobApplicationService;
+    private final CandidateBookmarkedJobService cBookmarkedJobService;
 
     @Transactional
     public CandidateProfile createNew(CandidateProfile profile) {
@@ -39,6 +41,14 @@ public class CandidateProfileService {
 
     public static String getResumeS3Path(int id) {
         return String.format("candidate-resumes/%d", id);
+    }
+
+    public boolean checkIfCandidateAppliedForJob(int candidateId, int jobId) {
+        return this.cJobApplicationService.checkIfCandidateAppliedForJob(candidateId, jobId);
+    }
+
+    public boolean checkIfCandidateBookmarkedJob(int id, int jobId) {
+        return this.cBookmarkedJobService.checkIfCandidateBookmarkedJob(id, jobId);
     }
 
 }

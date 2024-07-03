@@ -1,6 +1,7 @@
 import { ERole, EmploymentType, WorkAuthorization } from "../constants";
 
 import { Address } from "./address";
+import { CandidateBookmarkedJob } from "./candidate-bookmarked";
 import { ContactInformation } from "./contact-information";
 import { Education } from "./education";
 import { Interest } from "./interest";
@@ -15,6 +16,7 @@ export type CandidateProfile = {
     about?: string;
     hasProfilePhoto: boolean;
     hasResume: boolean;
+    portfolioWebsite?: string;
     preferredEmploymentType?: EmploymentType;
     workAuthorization?: WorkAuthorization;
     user: User;
@@ -23,6 +25,7 @@ export type CandidateProfile = {
     educations?: Education[];
     interests?: Interest[];
     skills?: Skill[];
+    bookmarkedJobs?: CandidateBookmarkedJob[];
 };
 
 export type NavbarRequiredCandidateProfileDetails = Pick<

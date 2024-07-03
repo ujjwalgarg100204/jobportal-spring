@@ -1,6 +1,8 @@
 import { EmploymentType, RemoteType } from "../constants";
 
 import { Address } from "./address";
+import { CandidateBookmarkedJob } from "./candidate-bookmarked";
+import { CandidateJobApplication } from "./candidate-job-application";
 import { Company } from "./company";
 import {
     GetRecruiterProfileByIdResponse,
@@ -15,11 +17,13 @@ export type Job = {
     employmentType: EmploymentType;
     remoteType: RemoteType;
     noOfVacancy: number;
-    recruiter: RecruiterProfile;
+    createdAt: string;
+    hiringComplete: boolean;
     address?: Address;
     company: Company;
-    hiringComplete: boolean;
-    createdAt: string;
+    recruiter: RecruiterProfile;
+    candidateJobApplications: CandidateJobApplication[];
+    candidateBookmarkedJobs: CandidateBookmarkedJob[];
 };
 
 export type GetJobByIdResponse = Omit<Job, "id" | "recruiter" | "company"> & {
@@ -33,7 +37,18 @@ export type GetRecruiterJobsResponse = Omit<Job, "id" | "company"> & {
     noOfApplicants: number;
 };
 
-export type JobViewPage = Omit<Job, "id"> & { id: Required<Job>["id"] };
+export type JobViewPage = Pick<
+    Job,
+    | "title"
+    | "address"
+    | "company"
+    | "createdAt"
+    | "salary"
+    | "employmentType"
+    | "remoteType"
+    | "description"
+    | "noOfVacancy"
+> & { id: Required<Job>["id"]; noOfAppliedCandidates: number };
 
 export type CreateNewJobRequest = Pick<
     Job,

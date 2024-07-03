@@ -5,6 +5,7 @@ import { Company } from "./company";
 import { ContactInformation } from "./contact-information";
 import { Education } from "./education";
 import { Interest } from "./interest";
+import { Job } from "./job";
 import { User } from "./user";
 
 export type RecruiterProfile = {
@@ -19,6 +20,7 @@ export type RecruiterProfile = {
     educations?: Education[];
     interests?: Interest[];
     company: Company;
+    jobs?: Job[];
 };
 
 export type NavbarRequiredRecruiterProfileDetails = Pick<

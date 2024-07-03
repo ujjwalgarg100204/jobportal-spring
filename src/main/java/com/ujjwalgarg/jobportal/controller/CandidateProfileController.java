@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -140,7 +141,7 @@ public class CandidateProfileController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = "/photo", consumes = MediaType.ALL_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/photo", consumes = MediaType.ALL_VALUE)
     public ResponseEntity<Response<String>> getProfilePhotoUrl() {
         User user = this.authService.getAuthenticatedUser();
         CandidateProfile profile = this.cProfileService
@@ -161,6 +162,24 @@ public class CandidateProfileController {
                 .message("Profile Photo fetched successfully")
                 .build();
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/jobApplications/{id}/@exists", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<Response<Boolean>> checkIfCandidateAppliedForJob(@PathVariable("id") Integer jobId) {
+        User user = this.authService.getAuthenticatedUser();
+        boolean applied = this.cProfileService.checkIfCandidateAppliedForJob(user.getId(), jobId);
+
+        var response = Response.success(applied, "Checked if candidate applied for job successfully");
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping(value = "/bookmarkedJobs/{id}/@exists", consumes = MediaType.ALL_VALUE)
+    public ResponseEntity<Response<Boolean>> checkIfCandidateHasBookmarkedJob(@PathVariable("id") Integer jobId) {
+        User user = this.authService.getAuthenticatedUser();
+        boolean bookmarked = this.cProfileService.checkIfCandidateBookmarkedJob(user.getId(), jobId);
+
+        var response = Response.success(bookmarked, "Checked if candidate bookmarked job successfully");
         return ResponseEntity.ok(response);
     }
 

@@ -2,6 +2,7 @@ package com.ujjwalgarg.jobportal.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.springframework.web.bind.annotation.GetMapping;
 
 import com.ujjwalgarg.jobportal.controller.payload.response.GetJobByIdResponse;
 import com.ujjwalgarg.jobportal.entity.Job;
@@ -12,7 +13,7 @@ import com.ujjwalgarg.jobportal.entity.Job;
 @Mapper(componentModel = "spring")
 public interface JobMapper {
 
-    @Mapping(target = "GetRecruiterProfileByIdResponse.profilePhotoUrl", ignore = true)
-    GetJobByIdResponse toGetJobByIdResponse(Job job);
+    @Mapping(target = "noOfAppliedCandidates", source = "noOfAppliedCandidates")
+    GetJobByIdResponse toGetJobByIdResponse(Job job, Integer noOfAppliedCandidates);
 
 }
