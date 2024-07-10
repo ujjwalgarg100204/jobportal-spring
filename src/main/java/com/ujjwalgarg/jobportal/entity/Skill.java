@@ -1,7 +1,6 @@
 package com.ujjwalgarg.jobportal.entity;
 
 import com.ujjwalgarg.jobportal.constant.ExperienceLevel;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,26 +30,26 @@ import lombok.NoArgsConstructor;
 @Table(name = "skill")
 public class Skill {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
 
-    @NotBlank(message = "Name of skill is mandatory")
-    @Column(name = "name", nullable = false)
-    private String name;
+  @NotBlank(message = "Name of skill is mandatory")
+  @Column(name = "name", nullable = false)
+  private String name;
 
-    @NotBlank(message = "Years of Experience of skill is mandatory")
-    @Column(name = "years_of_experience", nullable = false)
-    private String yearsOfExperience;
+  @NotBlank(message = "Years of Experience of skill is mandatory")
+  @Column(name = "years_of_experience", nullable = false)
+  private String yearsOfExperience;
 
-    @NotNull(message = "Experience level of skill is mandatory")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "experience_level", nullable = false)
-    private ExperienceLevel experienceLevel;
+  @NotNull(message = "Experience level of skill is mandatory")
+  @Enumerated(EnumType.STRING)
+  @Column(name = "experience_level", nullable = false)
+  private ExperienceLevel experienceLevel;
 
-    @ManyToOne(cascade = { CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH })
-    @JoinColumn(name = "candidate_profile_id", referencedColumnName = "user_id")
-    private CandidateProfile candidateProfile;
-
+  @ManyToOne(
+      cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
+  @JoinColumn(name = "candidate_profile_id", referencedColumnName = "user_id")
+  private CandidateProfile candidateProfile;
 }

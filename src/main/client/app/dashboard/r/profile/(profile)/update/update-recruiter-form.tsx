@@ -58,6 +58,7 @@ export default function UpdateRecruiterForm({
             [key]: prev[key] + 1,
         }));
     }
+
     function logoFileChangeHandler(ev: ChangeEvent<HTMLInputElement>) {
         if (ev.target.files) {
             setLogo(ev.target.files[0]);

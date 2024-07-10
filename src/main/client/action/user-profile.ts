@@ -265,6 +265,7 @@ function __getEducationsFromFormData(formData: FormData) {
 
     return educations;
 }
+
 function __getInterestsFromFormData(formData: FormData) {
     const ids = formData.getAll("interest.id");
     const titles = formData.getAll("interest.title");

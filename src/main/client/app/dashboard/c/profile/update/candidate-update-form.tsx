@@ -1,10 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@nextui-org/button";
 import { Input } from "@nextui-org/input";
 import { Select, SelectItem } from "@nextui-org/select";
-import { useState } from "react";
 import { useFormState } from "react-dom";
 
 import { updateCandidateProfileAction } from "@/action/user-profile";

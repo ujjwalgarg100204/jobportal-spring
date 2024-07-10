@@ -11,7 +11,7 @@ import NextLink from "@/lib/next-ui/link";
 
 type Props = {
     job: GetRecruiterJobsResponse & { company: Company };
-    actionProps: JobActionsProps;
+    actionProps?: JobActionsProps;
 };
 
 export default function JobCard({ job, actionProps }: Props) {
@@ -19,14 +19,18 @@ export default function JobCard({ job, actionProps }: Props) {
         <Card className="max-w-[340px]">
             <CardHeader className="flex gap-3">
                 <div className="flex flex-col gap-1">
-                    <NextLink
-                        showAnchorIcon
-                        className="text-lg font-semibold"
-                        href={`/dashboard/${actionProps.role === ERole.CANDIDATE ? "c" : "r"}/job/${job.id}`}
-                        underline="hover"
-                    >
-                        {job.title}
-                    </NextLink>
+                    {actionProps ? (
+                        <NextLink
+                            showAnchorIcon
+                            className="text-lg font-semibold"
+                            href={`/dashboard/${actionProps.role === ERole.CANDIDATE ? "c" : "r"}/job/${job.id}`}
+                            underline="hover"
+                        >
+                            {job.title}
+                        </NextLink>
+                    ) : (
+                        <h1 className="text-lg font-semibold">{job.title}</h1>
+                    )}
                     <p className="text-small text-default-500 flex items-center gap-2">
                         <FaBuilding className="size-4" /> {job.company.name}
                     </p>
@@ -37,7 +41,7 @@ export default function JobCard({ job, actionProps }: Props) {
                 <p>
                     Posted at: {new Date(job.createdAt).toLocaleString("en-US")}
                 </p>
-                {actionProps.role === ERole.RECRUITER && (
+                {actionProps?.role === ERole.RECRUITER && (
                     <p>
                         <span className="underline font-bold space-x-1">
                             {job.noOfApplicants}
@@ -45,7 +49,8 @@ export default function JobCard({ job, actionProps }: Props) {
                         Applicants applied
                     </p>
                 )}
-                {actionProps.role === ERole.CANDIDATE &&
+                {actionProps &&
+                    actionProps.role === ERole.CANDIDATE &&
                     (job.noOfApplicants === 0 ? (
                         <p>
                             Be the{" "}
@@ -63,10 +68,14 @@ export default function JobCard({ job, actionProps }: Props) {
                         </p>
                     ))}
             </CardBody>
-            <Divider />
-            <CardFooter>
-                <JobActions {...actionProps} />
-            </CardFooter>
+            {actionProps && (
+                <>
+                    <Divider />
+                    <CardFooter>
+                        <JobActions {...actionProps} />
+                    </CardFooter>
+                </>
+            )}
         </Card>
     );
 }

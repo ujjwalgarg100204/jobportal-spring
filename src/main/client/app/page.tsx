@@ -6,8 +6,7 @@ import {
     NavbarContent,
     NavbarItem,
 } from "@nextui-org/navbar";
-import { FaSearch } from "react-icons/fa";
-import { MdLocationPin } from "react-icons/md";
+import { FaBuilding, FaSearch } from "react-icons/fa";
 
 import Logo from "@/component/logo";
 import NextLink from "@/lib/next-ui/link";
@@ -78,11 +77,11 @@ export default async function IndexPage() {
                         type="text"
                     />
                     <Input
-                        label="Job Title"
+                        label="Company"
                         labelPlacement="inside"
-                        placeholder="Ex: Full-Stack Web Developer"
+                        placeholder="Ex: Microsoft"
                         startContent={
-                            <MdLocationPin className="text-base text-default-400 pointer-events-none flex-shrink-0" />
+                            <FaBuilding className="text-base text-default-400 pointer-events-none flex-shrink-0" />
                         }
                         type="text"
                     />

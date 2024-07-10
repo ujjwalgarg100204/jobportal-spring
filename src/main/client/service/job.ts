@@ -93,3 +93,23 @@ export async function deleteJobById(id: number | string) {
 
     return response;
 }
+
+export async function searchJobs() {
+    const response = await get<GetJobByIdResponse[]>(`${BASE_URL}/@search`, {
+        authenticatedRequest: true,
+        jsonRequest: true,
+        next: { tags: ["job"] },
+    });
+
+    if (response.success) {
+        logger.info(
+            `Successfully fetched jobs, response:${JSON.stringify(response)}`,
+        );
+    } else {
+        logger.error(
+            `Failed to fetch jobs, response:${JSON.stringify(response)}`,
+        );
+    }
+
+    return response;
+}

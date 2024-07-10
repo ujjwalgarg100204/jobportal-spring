@@ -24,17 +24,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "candidate_bookmarked_job")
 public class CandidateBookmarkedJob {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
 
-    @NotNull(message = "Candidate Profile is required")
-    @ManyToOne(optional = false)
-    private CandidateProfile candidateProfile;
+  @NotNull(message = "Candidate Profile is required")
+  @ManyToOne(optional = false)
+  private CandidateProfile candidateProfile;
 
-    @NotNull(message = "Job is required")
-    @ManyToOne(optional = false)
-    private Job job;
-
+  @NotNull(message = "Job is required")
+  @ManyToOne(optional = false)
+  private Job job;
 }

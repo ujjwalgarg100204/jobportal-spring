@@ -23,17 +23,16 @@ import lombok.NoArgsConstructor;
 @Table(name = "education")
 public class Education {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
 
-    @NotBlank(message = "Title is mandatory")
-    @Column(name = "title", nullable = false)
-    private String title;
+  @NotBlank(message = "Title is mandatory")
+  @Column(name = "title", nullable = false)
+  private String title;
 
-    @NotBlank(message = "Description is mandatory")
-    @Column(name = "description", nullable = false)
-    private String description;
-
+  @NotBlank(message = "Description is mandatory")
+  @Column(name = "description", nullable = false)
+  private String description;
 }

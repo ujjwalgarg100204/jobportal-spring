@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { RedirectType, redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 import { createNewJob, deleteJobById, updateJob } from "@/service/job";
 import { ActionResponse } from "@/type/backend-communication";

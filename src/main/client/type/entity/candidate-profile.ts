@@ -1,4 +1,4 @@
-import { ERole, EmploymentType, WorkAuthorization } from "../constants";
+import { EmploymentType, ERole, WorkAuthorization } from "../constants";
 
 import { Address } from "./address";
 import { CandidateBookmarkedJob } from "./candidate-bookmarked";

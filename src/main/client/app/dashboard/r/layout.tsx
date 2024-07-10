@@ -1,4 +1,4 @@
-import { RedirectType, redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { ReactNode } from "react";
 
 import { getServerSession } from "@/service/auth";
@@ -9,7 +9,11 @@ type Props = {
 };
 
 export default async function RecruiterDashboardLayout({ children }: Props) {
-    const session = (await getServerSession())!;
+    const session = await getServerSession();
+
+    if (!session) {
+        redirect("/auth/login");
+    }
 
     if (session.user.role === ERole.RECRUITER) {
         return children;

@@ -1,19 +1,37 @@
 package com.ujjwalgarg.jobportal.controller.payload;
 
-import lombok.Builder;
+import java.util.ArrayList;
+import java.util.List;
+import lombok.Data;
 
-/**
- * Response
- */
-@Builder
-public record Response<T>(boolean success, T data, String message) {
+@Data
+public class Response<T> {
 
-    public static <T> Response<T> success(T data, String message) {
-        return Response.<T>builder()
-                .success(true)
-                .data(data)
-                .message(message)
-                .build();
+  private final boolean success;
+  private final String message;
+  private T data;
+  private List<ValidationError> validationErrors;
+
+  public static <T> Response<T> success(T data, String message) {
+    var response = new Response<T>(true, message);
+    response.setData(data);
+    return response;
+  }
+
+  public static <T> Response<T> failure(String message) {
+    return new Response<>(false, message);
+  }
+
+  public void addValidationError(String field, String message) {
+    if (this.validationErrors == null) {
+      this.validationErrors = new ArrayList<>();
     }
 
+    var validationError = new ValidationError(field, message);
+    this.validationErrors.add(validationError);
+  }
+
+  private record ValidationError(String field, String message) {
+
+  }
 }

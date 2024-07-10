@@ -23,13 +23,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "interest")
 public class Interest {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
 
-    @NotBlank(message = "Interest can't be empty")
-    @Column(name = "title", nullable = false)
-    private String title;
-
+  @NotBlank(message = "Interest can't be empty")
+  @Column(name = "title", nullable = false)
+  private String title;
 }

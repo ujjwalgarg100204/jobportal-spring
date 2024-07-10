@@ -1,4 +1,4 @@
-import { RedirectType, redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 
 import LoginForm from "./login-form";
 

@@ -23,20 +23,19 @@ import lombok.NoArgsConstructor;
 @Table(name = "address")
 public class Address {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
 
-    @Column(name = "city")
-    private String city;
+  @Column(name = "city")
+  private String city;
 
-    @NotBlank(message = "State is mandatory")
-    @Column(name = "state", nullable = false)
-    private String state;
+  @NotBlank(message = "State is mandatory")
+  @Column(name = "state", nullable = false)
+  private String state;
 
-    @NotBlank(message = "Country is mandatory")
-    @Column(name = "country", nullable = false)
-    private String country;
-
+  @NotBlank(message = "Country is mandatory")
+  @Column(name = "country", nullable = false)
+  private String country;
 }

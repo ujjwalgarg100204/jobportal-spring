@@ -1,13 +1,11 @@
 package com.ujjwalgarg.jobportal.security.services;
 
+import com.ujjwalgarg.jobportal.entity.User;
+import com.ujjwalgarg.jobportal.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
-
-import com.ujjwalgarg.jobportal.entity.User;
-import com.ujjwalgarg.jobportal.exception.EntityNotFoundException;
-import com.ujjwalgarg.jobportal.service.UserService;
 
 /**
  * AuthService
@@ -15,20 +13,17 @@ import com.ujjwalgarg.jobportal.service.UserService;
 @Service
 public class AuthService {
 
-    private final UserService userService;
+  private final UserServiceImpl userService;
 
-    @Autowired
-    public AuthService(UserService userService) {
-        this.userService = userService;
-    }
+  @Autowired
+  public AuthService(UserServiceImpl userService) {
+    this.userService = userService;
+  }
 
-    public User getAuthenticatedUser() {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return this.userService
-                .getUserByEmail(userDetails.getUsername())
-                .orElseThrow(() -> new EntityNotFoundException(String.format(
-                        "Invalid authentication request, user with email:%s does not exist",
-                        userDetails.getUsername())));
-    }
-
+  public User getAuthenticatedUser() {
+    UserDetails userDetails =
+        (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    return this.userService
+        .getUserByEmail(userDetails.getUsername());
+  }
 }

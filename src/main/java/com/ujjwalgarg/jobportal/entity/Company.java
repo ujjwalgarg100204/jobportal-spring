@@ -1,7 +1,5 @@
 package com.ujjwalgarg.jobportal.entity;
 
-import java.util.List;
-
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +12,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,26 +29,25 @@ import lombok.NoArgsConstructor;
 @Table(name = "company")
 public class Company {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "id")
+  private Integer id;
 
-    @NotBlank(message = "Name of company is mandatory")
-    @Column(name = "name", nullable = false, unique = true)
-    private String name;
+  @NotBlank(message = "Name of company is mandatory")
+  @Column(name = "name", nullable = false, unique = true)
+  private String name;
 
-    @Column(name = "has_logo", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
-    private Boolean hasLogo;
+  @Column(name = "has_logo", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
+  private Boolean hasLogo;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "address_id", referencedColumnName = "id")
-    private Address address;
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @JoinColumn(name = "address_id", referencedColumnName = "id")
+  private Address address;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
-    private List<RecruiterProfile> recruiterProfile;
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
+  private List<RecruiterProfile> recruiterProfile;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
-    private List<Job> jobs;
-
+  @OneToMany(cascade = CascadeType.ALL, mappedBy = "company", fetch = FetchType.LAZY)
+  private List<Job> jobs;
 }
