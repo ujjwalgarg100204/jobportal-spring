@@ -1,9 +1,7 @@
-package com.ujjwalgarg.jobportal.security;
+package com.ujjwalgarg.jobportal.configuration.security;
 
-import com.ujjwalgarg.jobportal.security.jwt.AuthEntryPointJwt;
-import com.ujjwalgarg.jobportal.security.jwt.AuthTokenFilter;
-import com.ujjwalgarg.jobportal.security.services.UserDetailsServiceImpl;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.ujjwalgarg.jobportal.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,25 +22,17 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
  */
 @Configuration
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig {
 
-  private final UserDetailsServiceImpl userDetailsService;
+  private final UserService userService;
   private final AuthEntryPointJwt unauthorizedHandler;
   private final AuthTokenFilter authTokenFilter;
 
   private final String[] publicUrls = {
       "/api/auth/**",
+      "/error"
   };
-
-  @Autowired
-  public WebSecurityConfig(
-      UserDetailsServiceImpl userDetailsService,
-      AuthEntryPointJwt unauthorizedHandler,
-      AuthTokenFilter authTokenFilter) {
-    this.userDetailsService = userDetailsService;
-    this.unauthorizedHandler = unauthorizedHandler;
-    this.authTokenFilter = authTokenFilter;
-  }
 
   @Bean
   public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -58,7 +48,7 @@ public class WebSecurityConfig {
   @Bean
   public DaoAuthenticationProvider authenticationProvider() {
     DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-    authProvider.setUserDetailsService(userDetailsService);
+    authProvider.setUserDetailsService(userService);
     authProvider.setPasswordEncoder(passwordEncoder());
 
     return authProvider;

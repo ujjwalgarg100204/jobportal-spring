@@ -1,20 +1,17 @@
 package com.ujjwalgarg.jobportal.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import com.ujjwalgarg.jobportal.constant.ERole;
 import com.ujjwalgarg.jobportal.entity.Role;
 import com.ujjwalgarg.jobportal.exception.AlreadyPresentException;
 import com.ujjwalgarg.jobportal.exception.NotFoundException;
 import com.ujjwalgarg.jobportal.repository.RoleRepository;
+import com.ujjwalgarg.jobportal.service.impl.RoleServiceImpl;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -28,7 +25,7 @@ class RoleServiceTest {
   private RoleRepository roleRepository;
 
   @InjectMocks
-  private RoleService roleService;
+  private RoleServiceImpl roleService;
 
   private Role mockRole;
 
@@ -38,32 +35,37 @@ class RoleServiceTest {
   }
 
   @Test
-  void getRoleByName_whenRoleExists_thenReturnsRole() {
+  @DisplayName("Test getRoleByName() when role exists")
+  void getRoleByName_RoleExists_ReturnsRole() {
     when(roleRepository.findByName(ERole.ROLE_CANDIDATE)).thenReturn(Optional.of(mockRole));
     Role foundRole = roleService.getRoleByName(ERole.ROLE_CANDIDATE);
     assertEquals(mockRole, foundRole);
   }
 
   @Test
-  void getRoleByName_whenRoleDoesNotExist_thenThrowNotFoundException() {
+  @DisplayName("Test getRoleByName() when role does not exist")
+  void getRoleByName_RoleDoesNotExist_ThrowsNotFoundException() {
     when(roleRepository.findByName(ERole.ROLE_CANDIDATE)).thenReturn(Optional.empty());
     assertThrows(NotFoundException.class, () -> roleService.getRoleByName(ERole.ROLE_CANDIDATE));
   }
 
   @Test
-  void checkIfExistsByName_whenRoleExists_thenReturnsTrue() {
+  @DisplayName("Test checkIfExistsByName() when role exists")
+  void checkIfExistsByName_RoleExists_ReturnsTrue() {
     when(roleRepository.existsByName(ERole.ROLE_CANDIDATE)).thenReturn(true);
     assertTrue(roleService.checkIfExistsByName(ERole.ROLE_CANDIDATE));
   }
 
   @Test
-  void checkIfExistsByName_whenRoleDoesNotExist_thenReturnsFalse() {
+  @DisplayName("Test checkIfExistsByName() when role does not exist")
+  void checkIfExistsByName_RoleDoesNotExist_ReturnsFalse() {
     when(roleRepository.existsByName(ERole.ROLE_CANDIDATE)).thenReturn(false);
     assertFalse(roleService.checkIfExistsByName(ERole.ROLE_CANDIDATE));
   }
 
   @Test
-  void createNew_whenRoleDoesNotExist_thenReturnsRole() {
+  @DisplayName("Test createNew() when role does not exist")
+  void createNew_RoleDoesNotExist_ReturnsRole() {
     when(roleRepository.existsByName(any())).thenReturn(false);
     when(roleRepository.save(any(Role.class))).thenReturn(mockRole);
 
@@ -74,7 +76,8 @@ class RoleServiceTest {
   }
 
   @Test
-  void createNew_whenRoleAlreadyExists_thenThrowAlreadyPresentException() {
+  @DisplayName("Test createNew() when role already exists")
+  void createNew_RoleAlreadyExists_ThrowsAlreadyPresentException() {
     when(roleRepository.existsByName(any())).thenReturn(true);
     assertThrows(AlreadyPresentException.class, () -> roleService.createNew(mockRole));
   }

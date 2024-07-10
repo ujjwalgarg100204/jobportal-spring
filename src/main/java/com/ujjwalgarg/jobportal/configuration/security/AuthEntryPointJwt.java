@@ -1,12 +1,12 @@
-package com.ujjwalgarg.jobportal.security.jwt;
+package com.ujjwalgarg.jobportal.configuration.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ujjwalgarg.jobportal.controller.payload.Response;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
@@ -39,17 +39,14 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
       HttpServletResponse response,
       AuthenticationException authException)
       throws IOException {
-    log.error("Unauthorized error: {}", authException.getMessage());
+    log.error("Unauthorized access to resource:{}, failed with error:{}", request.getServletPath(),
+        authException.toString());
 
-    Map<String, Object> body = new HashMap<>();
-    body.put("success", false);
-    body.put("error", "Unauthorized");
-    body.put("message", authException.getMessage());
-    body.put("path", request.getServletPath());
-
+    var res = Response.failure(
+        String.format("You are not authorized to access this resource:%s, error message:%s",
+            request.getServletPath(), authException.getMessage()));
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.setHeader("Content-Type", "application/json");
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.writeValue(response.getOutputStream(), body);
+    response.setHeader("Content-Type", MediaType.APPLICATION_JSON_VALUE);
+    new ObjectMapper().writeValue(response.getOutputStream(), res);
   }
 }

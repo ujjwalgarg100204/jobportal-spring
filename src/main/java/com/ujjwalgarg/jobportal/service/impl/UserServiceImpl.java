@@ -12,8 +12,14 @@ import com.ujjwalgarg.jobportal.repository.RecruiterProfileRepository;
 import com.ujjwalgarg.jobportal.repository.UserRepository;
 import com.ujjwalgarg.jobportal.service.RoleService;
 import com.ujjwalgarg.jobportal.service.UserService;
+import java.util.Collection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,4 +102,37 @@ public class UserServiceImpl implements UserService {
           return new NotFoundException("User with email:" + email + " not found");
         });
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+    User foundUser =
+        this.userRepository
+            .findByEmail(email)
+            .orElseThrow(
+                () ->
+                    new UsernameNotFoundException(
+                        "No users exists with email %s".formatted(email)));
+
+    List<SimpleGrantedAuthority> authorities =
+        List.of(new SimpleGrantedAuthority(foundUser.getRole().getName().toString()));
+
+    return new UserDetails() {
+      @Override
+      public Collection<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+      }
+
+      @Override
+      public String getPassword() {
+        return foundUser.getPassword();
+      }
+
+      @Override
+      public String getUsername() {
+        return foundUser.getEmail();
+      }
+    };
+  }
+
 }
