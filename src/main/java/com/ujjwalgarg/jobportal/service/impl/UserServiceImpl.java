@@ -46,7 +46,8 @@ public class UserServiceImpl implements UserService {
    * @throws NotFoundException       if the candidate role is not found in the system.
    */
   @Transactional
-  public User createNewCandidate(User user, CandidateProfile cProfile) {
+  public User createNewCandidate(User user, CandidateProfile cProfile)
+      throws AlreadyPresentException {
     // check if candidate already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
       log.warn("Candidate with email:{} already exists", user.getEmail());
@@ -71,7 +72,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Transactional
-  public User createNewRecruiter(User user, RecruiterProfile rProfile) {
+  public User createNewRecruiter(User user, RecruiterProfile rProfile)
+      throws AlreadyPresentException {
     // check if user already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
       log.warn("Recruiter with email:{} already exists", user.getEmail());
@@ -95,7 +97,7 @@ public class UserServiceImpl implements UserService {
     return savedUser;
   }
 
-  public User getUserByEmail(String email) {
+  public User getUserByEmail(String email) throws NotFoundException {
     return this.userRepository.findByEmail(email)
         .orElseThrow(() -> {
           log.error("User with email:{} not found", email);
