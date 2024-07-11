@@ -1,5 +1,7 @@
 package com.ujjwalgarg.jobportal.controller.payload;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Data;
@@ -9,7 +11,11 @@ public class Response<T> {
 
   private final boolean success;
   private final String message;
+
+  @JsonInclude(Include.NON_NULL)
   private T data;
+
+  @JsonInclude(Include.NON_NULL)
   private List<ValidationError> validationErrors;
 
   public static <T> Response<T> success(T data, String message) {
