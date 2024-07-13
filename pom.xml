@@ -32,6 +32,10 @@
               <version>${org.mapstruct.version}</version>
             </path>
           </annotationProcessorPaths>
+          <compilerArgs>
+            <arg>-Amapstruct.verbose=true</arg>
+          </compilerArgs>
+          <showWarnings>true</showWarnings>
           <source>1.8</source>
           <target>1.8</target>
         </configuration>
