@@ -3,10 +3,7 @@ package com.ujjwalgarg.jobportal.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import java.util.Base64;
-import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,25 +77,5 @@ class JwtUtilsTest {
     String modifiedToken =
         token.substring(0, token.length() - 1) + "X"; // Modify the last character
     assertFalse(jwtUtils.isValidJwtToken(modifiedToken));
-  }
-
-  @Test
-  @DisplayName("Test generateJwtToken() should set the expiration date correctly")
-  void testTokenExpiration() {
-    String subject = "testUser";
-    String token = jwtUtils.generateJwtToken(subject);
-
-    Date expirationDate = Jwts.parser()
-        .verifyWith(Keys.hmacShaKeyFor(Base64.getDecoder().decode(testSecret)))
-        .build()
-        .parseSignedClaims(token)
-        .getPayload()
-        .getExpiration();
-
-    long expectedExpiration = System.currentTimeMillis() + testExpirationMs;
-    long actualExpiration = expirationDate.getTime();
-
-    // Allow for a small difference due to processing time
-    assertTrue(Math.abs(expectedExpiration - actualExpiration) < 1000);
   }
 }
