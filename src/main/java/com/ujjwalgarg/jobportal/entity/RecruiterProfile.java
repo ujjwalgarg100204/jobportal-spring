@@ -1,5 +1,7 @@
 package com.ujjwalgarg.jobportal.entity;
 
+import com.ujjwalgarg.jobportal.validator.Create;
+import com.ujjwalgarg.jobportal.validator.Update;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,9 +16,11 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -30,13 +34,15 @@ import org.hibernate.validator.constraints.Length;
 public class RecruiterProfile {
 
   @Id
+  @NotNull(groups = Update.class)
+  @Null(groups = Create.class)
   private Integer id;
 
-  @NotBlank(message = "First Name is mandatory")
+  @NotBlank(message = "First Name is mandatory", groups = {Create.class, Update.class})
   @Column(name = "first_name", nullable = false)
   private String firstName;
 
-  @NotBlank(message = "Last Name is mandatory")
+  @NotBlank(message = "Last Name is mandatory", groups = {Create.class, Update.class})
   @Column(name = "last_name", nullable = false)
   private String lastName;
 
@@ -44,9 +50,11 @@ public class RecruiterProfile {
   @Column(name = "about", length = 10_000)
   private String about;
 
+  @Default
   @Column(name = "has_profile_photo", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
-  private Boolean hasProfilePhoto;
+  private Boolean hasProfilePhoto = false;
 
+  @NotNull(groups = {Update.class})
   @OneToOne(cascade = CascadeType.ALL)
   @MapsId
   private User user;
@@ -73,7 +81,8 @@ public class RecruiterProfile {
       inverseJoinColumns = @JoinColumn(name = "id"))
   private List<Interest> interests;
 
-  @NotNull(message = "Company must be defined for a recruiter")
+  @NotNull(message = "Company must be defined for a recruiter", groups = {Create.class,
+      Update.class})
   @ManyToOne(cascade = CascadeType.ALL, optional = false)
   @JoinColumn(name = "company_id", referencedColumnName = "id")
   private Company company;

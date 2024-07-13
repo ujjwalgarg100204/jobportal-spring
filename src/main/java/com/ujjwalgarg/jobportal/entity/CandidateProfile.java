@@ -20,6 +20,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.validator.constraints.Length;
@@ -55,11 +56,13 @@ public class CandidateProfile {
   @Column(name = "about", length = 10_000)
   private String about;
 
+  @Default
   @Column(name = "has_profile_photo", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
-  private Boolean hasProfilePhoto;
+  private Boolean hasProfilePhoto = false;
 
+  @Default
   @Column(name = "has_resume", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
-  private Boolean hasResume;
+  private Boolean hasResume = false;
 
   @URL
   @Column(name = "portfolio_website")

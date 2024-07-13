@@ -2,6 +2,8 @@ package com.ujjwalgarg.jobportal.entity;
 
 import com.ujjwalgarg.jobportal.constant.EmploymentType;
 import com.ujjwalgarg.jobportal.constant.RemoteType;
+import com.ujjwalgarg.jobportal.validator.Create;
+import com.ujjwalgarg.jobportal.validator.Update;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,10 +21,12 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -41,6 +45,8 @@ public class Job {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
+  @NotNull(groups = Update.class)
+  @Null(groups = Create.class)
   private Integer id;
 
   @NotBlank(message = "Title is required")
@@ -69,6 +75,7 @@ public class Job {
   @Column(name = "no_of_vacancy", nullable = false)
   private Integer noOfVacancy;
 
+  @Null
   @CreationTimestamp
   @Column(
       name = "created_at",
@@ -77,8 +84,9 @@ public class Job {
       updatable = false)
   private LocalDate createdAt;
 
+  @Default
   @Column(name = "hiring_complete", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
-  private Boolean hiringComplete;
+  private Boolean hiringComplete = false;
 
   @NotNull(message = "Recruiter profile is required")
   @ManyToOne(optional = false, fetch = FetchType.LAZY)

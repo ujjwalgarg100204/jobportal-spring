@@ -1,11 +1,13 @@
 package com.ujjwalgarg.jobportal.entity;
 
 import com.ujjwalgarg.jobportal.constant.ExperienceLevel;
-import jakarta.persistence.CascadeType;
+import com.ujjwalgarg.jobportal.validator.Create;
+import com.ujjwalgarg.jobportal.validator.Update;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -14,6 +16,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -33,23 +36,26 @@ public class Skill {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")
+  @Null(groups = Create.class)
+  @NotNull(groups = Update.class)
   private Integer id;
 
-  @NotBlank(message = "Name of skill is mandatory")
+  @NotBlank(message = "Name of skill is mandatory", groups = {Create.class, Update.class})
   @Column(name = "name", nullable = false)
   private String name;
 
-  @NotBlank(message = "Years of Experience of skill is mandatory")
+  @NotBlank(message = "Years of Experience of skill is mandatory", groups = {Create.class,
+      Update.class})
   @Column(name = "years_of_experience", nullable = false)
   private String yearsOfExperience;
 
-  @NotNull(message = "Experience level of skill is mandatory")
+  @NotNull(message = "Experience level of skill is mandatory", groups = {Create.class,
+      Update.class})
   @Enumerated(EnumType.STRING)
   @Column(name = "experience_level", nullable = false)
   private ExperienceLevel experienceLevel;
 
-  @ManyToOne(
-      cascade = {CascadeType.MERGE, CascadeType.DETACH, CascadeType.PERSIST, CascadeType.REFRESH})
+  @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "candidate_profile_id", referencedColumnName = "user_id")
   private CandidateProfile candidateProfile;
 }

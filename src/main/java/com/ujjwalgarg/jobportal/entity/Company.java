@@ -15,6 +15,7 @@ import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -38,8 +39,9 @@ public class Company {
   @Column(name = "name", nullable = false, unique = true)
   private String name;
 
+  @Default
   @Column(name = "has_logo", nullable = false, columnDefinition = "BIT(1) DEFAULT 0")
-  private Boolean hasLogo;
+  private Boolean hasLogo = false;
 
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @JoinColumn(name = "address_id", referencedColumnName = "id")

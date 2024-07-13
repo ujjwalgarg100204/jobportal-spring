@@ -8,9 +8,9 @@ import com.ujjwalgarg.jobportal.exception.NotFoundException;
 
 public interface UserService {
 
-  User createNewCandidate(User user, CandidateProfile cProfile) throws AlreadyPresentException;
+  void createNewCandidate(User user, CandidateProfile cProfile) throws AlreadyPresentException;
 
-  User createNewRecruiter(User user, RecruiterProfile rProfile) throws AlreadyPresentException;
+  void createNewRecruiter(User user, RecruiterProfile rProfile) throws AlreadyPresentException;
 
   User getUserByEmail(String email) throws NotFoundException;
 }
