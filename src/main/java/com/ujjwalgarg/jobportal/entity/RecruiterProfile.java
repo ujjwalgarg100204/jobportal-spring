@@ -2,21 +2,8 @@ package com.ujjwalgarg.jobportal.entity;
 
 import com.ujjwalgarg.jobportal.validator.Create;
 import com.ujjwalgarg.jobportal.validator.Update;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.MapsId;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Null;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -59,7 +46,7 @@ public class RecruiterProfile {
   @MapsId
   private User user;
 
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   @JoinColumn(name = "address_id", referencedColumnName = "id")
   private Address address;
 
