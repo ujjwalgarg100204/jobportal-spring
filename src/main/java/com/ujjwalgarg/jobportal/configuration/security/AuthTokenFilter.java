@@ -1,6 +1,5 @@
 package com.ujjwalgarg.jobportal.configuration.security;
 
-import com.ujjwalgarg.jobportal.service.UserService;
 import com.ujjwalgarg.jobportal.util.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -29,7 +29,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AuthTokenFilter extends OncePerRequestFilter {
 
   private final JwtUtils jwtUtils;
-  private final UserService userService;
+  private final UserDetailsService userDetailsService;
 
 
   @Override
@@ -44,7 +44,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
       if (jwt != null && jwtUtils.isValidJwtToken(jwt)) {
         String email = jwtUtils.getSubjectOfJwtToken(jwt);
 
-        UserDetails userDetails = userService.loadUserByUsername(email);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         var authentication = new UsernamePasswordAuthenticationToken(
             userDetails, null, userDetails.getAuthorities());
         authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
