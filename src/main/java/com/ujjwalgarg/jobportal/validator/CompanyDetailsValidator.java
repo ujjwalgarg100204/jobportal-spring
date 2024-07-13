@@ -1,28 +1,78 @@
 package com.ujjwalgarg.jobportal.validator;
 
 import com.ujjwalgarg.jobportal.annotation.ValidCompanyDetails;
-import com.ujjwalgarg.jobportal.controller.payload.auth.RegisterNewRecruiterRequest;
+import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
 public class CompanyDetailsValidator implements
-    ConstraintValidator<ValidCompanyDetails, RegisterNewRecruiterRequest> {
+    ConstraintValidator<ValidCompanyDetails, NewRecruiterRequest> {
 
   private static boolean isNotNullAndNonEmpty(String s) {
-    return s != null && !s.isEmpty();
+    return s == null || s.isEmpty();
   }
 
   @Override
-  public boolean isValid(RegisterNewRecruiterRequest request, ConstraintValidatorContext context) {
-    // request is considered valid only, if either company id is provided or company information
-    // is provided, not both
+  public boolean isValid(NewRecruiterRequest request, ConstraintValidatorContext context) {
+    boolean isValid = true;
+
     if (request.companyId() == null) {
-      return isNotNullAndNonEmpty(request.companyName()) &&
-          isNotNullAndNonEmpty(request.companyAddressState()) &&
-          isNotNullAndNonEmpty(request.companyAddressCountry());
+      if (isNotNullAndNonEmpty(request.companyName())) {
+        context.buildConstraintViolationWithTemplate(
+                "Company name must be provided if company ID is not specified.")
+            .addPropertyNode("companyName")
+            .addConstraintViolation();
+        isValid = false;
+      }
+      if (isNotNullAndNonEmpty(request.companyAddressState())) {
+        context.buildConstraintViolationWithTemplate(
+                "Company state must be provided if company ID is not specified.")
+            .addPropertyNode("companyAddressState")
+            .addConstraintViolation();
+        isValid = false;
+      }
+      if (isNotNullAndNonEmpty(request.companyAddressCountry())) {
+        context.buildConstraintViolationWithTemplate(
+                "Company country must be provided if company ID is not specified.")
+            .addPropertyNode("companyAddressCountry")
+            .addConstraintViolation();
+        isValid = false;
+      }
     } else {
-      return request.companyName() == null && request.companyAddressCity() == null &&
-          request.companyAddressState() == null && request.companyAddressCountry() == null;
+      if (request.companyName() != null) {
+        context.buildConstraintViolationWithTemplate(
+                "Company name must be null if company ID is specified.")
+            .addPropertyNode("companyName")
+            .addConstraintViolation();
+        isValid = false;
+      }
+      if (request.companyAddressCity() != null) {
+        context.buildConstraintViolationWithTemplate(
+                "Company city must be null if company ID is specified.")
+            .addPropertyNode("companyAddressCity")
+            .addConstraintViolation();
+        isValid = false;
+      }
+      if (request.companyAddressState() != null) {
+        context.buildConstraintViolationWithTemplate(
+                "Company state must be null if company ID is specified.")
+            .addPropertyNode("companyAddressState")
+            .addConstraintViolation();
+        isValid = false;
+      }
+      if (request.companyAddressCountry() != null) {
+        context.buildConstraintViolationWithTemplate(
+                "Company country must be null if company ID is specified.")
+            .addPropertyNode("companyAddressCountry")
+            .addConstraintViolation();
+        isValid = false;
+      }
     }
+
+    if (!isValid) {
+      context.disableDefaultConstraintViolation();
+    }
+
+    return isValid;
   }
 }

@@ -1,15 +1,14 @@
 package com.ujjwalgarg.jobportal.annotation;
 
-import static java.lang.annotation.ElementType.TYPE;
-
 import com.ujjwalgarg.jobportal.validator.CompanyDetailsValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
+import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target(TYPE)
+@Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = CompanyDetailsValidator.class)
 public @interface ValidCompanyDetails {
