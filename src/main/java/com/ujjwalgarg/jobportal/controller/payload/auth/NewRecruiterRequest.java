@@ -1,12 +1,15 @@
 package com.ujjwalgarg.jobportal.controller.payload.auth;
 
 import com.ujjwalgarg.jobportal.annotation.ValidCompanyDetails;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 
+@Builder
 @ValidCompanyDetails
-public record RegisterNewRecruiterRequest(
+public record NewRecruiterRequest(
     // user fields
-    @NotBlank(message = "Email is required") String email,
+    @NotBlank(message = "Email is required") @Email String email,
     @NotBlank(message = "Password is required") String password,
 
     // profile fields
@@ -20,6 +23,5 @@ public record RegisterNewRecruiterRequest(
     String companyAddressState,
     String companyAddressCountry
 ) {
-
 
 }
