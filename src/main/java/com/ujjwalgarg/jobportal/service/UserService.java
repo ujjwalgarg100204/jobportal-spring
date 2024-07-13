@@ -5,9 +5,8 @@ import com.ujjwalgarg.jobportal.entity.RecruiterProfile;
 import com.ujjwalgarg.jobportal.entity.User;
 import com.ujjwalgarg.jobportal.exception.AlreadyPresentException;
 import com.ujjwalgarg.jobportal.exception.NotFoundException;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
-public interface UserService extends UserDetailsService {
+public interface UserService {
 
   User createNewCandidate(User user, CandidateProfile cProfile) throws AlreadyPresentException;
 

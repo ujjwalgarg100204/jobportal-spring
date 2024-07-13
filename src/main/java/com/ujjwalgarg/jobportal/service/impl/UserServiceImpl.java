@@ -12,14 +12,12 @@ import com.ujjwalgarg.jobportal.repository.RecruiterProfileRepository;
 import com.ujjwalgarg.jobportal.repository.UserRepository;
 import com.ujjwalgarg.jobportal.service.RoleService;
 import com.ujjwalgarg.jobportal.service.UserService;
-import java.util.Collection;
-import java.util.List;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +33,7 @@ public class UserServiceImpl implements UserService {
   private final RoleService roleService;
   private final CandidateProfileRepository cProfileRepository;
   private final RecruiterProfileRepository rProfileRepository;
+  private final PasswordEncoder passwordEncoder;
 
   /**
    * Creates a new candidate user along with their profile.
@@ -46,7 +45,7 @@ public class UserServiceImpl implements UserService {
    * @throws NotFoundException       if the candidate role is not found in the system.
    */
   @Transactional
-  public User createNewCandidate(User user, CandidateProfile cProfile)
+  public User createNewCandidate(@Valid User user, @Valid CandidateProfile cProfile)
       throws AlreadyPresentException {
     // check if candidate already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
@@ -54,6 +53,7 @@ public class UserServiceImpl implements UserService {
       throw new AlreadyPresentException(
           "Candidate with email:" + user.getEmail() + " already exists");
     }
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
 
     Role candidateRole = this.roleService.getRoleByName(ERole.ROLE_CANDIDATE);
     user.setRole(candidateRole);
@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
   }
 
   @Transactional
-  public User createNewRecruiter(User user, RecruiterProfile rProfile)
+  public User createNewRecruiter(@Valid User user, @Valid RecruiterProfile rProfile)
       throws AlreadyPresentException {
     // check if user already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
@@ -81,9 +81,11 @@ public class UserServiceImpl implements UserService {
           "Recruiter with email:" + user.getEmail() + " already exists");
     }
 
-    Role role = this.roleService.getRoleByName(ERole.ROLE_RECRUITER);
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
 
+    Role role = this.roleService.getRoleByName(ERole.ROLE_RECRUITER);
     user.setRole(role);
+
     User savedUser = this.userRepository.save(user);
     log.info("New recruiter created with id:{}", savedUser.getId());
 
@@ -97,44 +99,11 @@ public class UserServiceImpl implements UserService {
     return savedUser;
   }
 
-  public User getUserByEmail(String email) throws NotFoundException {
+  public User getUserByEmail(@Valid @NotNull @Email String email) throws NotFoundException {
     return this.userRepository.findByEmail(email)
         .orElseThrow(() -> {
           log.error("User with email:{} not found", email);
           return new NotFoundException("User with email:" + email + " not found");
         });
   }
-
-  @Override
-  @Transactional(readOnly = true)
-  public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-    User foundUser =
-        this.userRepository
-            .findByEmail(email)
-            .orElseThrow(
-                () ->
-                    new UsernameNotFoundException(
-                        "No users exists with email %s".formatted(email)));
-
-    List<SimpleGrantedAuthority> authorities =
-        List.of(new SimpleGrantedAuthority(foundUser.getRole().getName().toString()));
-
-    return new UserDetails() {
-      @Override
-      public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
-      }
-
-      @Override
-      public String getPassword() {
-        return foundUser.getPassword();
-      }
-
-      @Override
-      public String getUsername() {
-        return foundUser.getEmail();
-      }
-    };
-  }
-
 }
