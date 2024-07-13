@@ -40,12 +40,11 @@ public class UserServiceImpl implements UserService {
    *
    * @param user     The user details to be saved.
    * @param cProfile The candidate profile details to be associated with the user.
-   * @return The saved user entity with a candidate role.
    * @throws AlreadyPresentException if a user with the same email already exists.
    * @throws NotFoundException       if the candidate role is not found in the system.
    */
   @Transactional
-  public User createNewCandidate(@Valid User user, @Valid CandidateProfile cProfile)
+  public void createNewCandidate(@Valid User user, @Valid CandidateProfile cProfile)
       throws AlreadyPresentException {
     // check if candidate already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
@@ -67,12 +66,10 @@ public class UserServiceImpl implements UserService {
         "Candidate profile with id:{} created for user with id:{}",
         savedCProfile.getId(),
         savedUser.getId());
-
-    return savedUser;
   }
 
   @Transactional
-  public User createNewRecruiter(@Valid User user, @Valid RecruiterProfile rProfile)
+  public void createNewRecruiter(@Valid User user, @Valid RecruiterProfile rProfile)
       throws AlreadyPresentException {
     // check if user already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
@@ -95,8 +92,6 @@ public class UserServiceImpl implements UserService {
         "Recruiter profile with id:{} created for user with id:{}",
         savedRProfile.getId(),
         savedUser.getId());
-
-    return savedUser;
   }
 
   public User getUserByEmail(@Valid @NotNull @Email String email) throws NotFoundException {

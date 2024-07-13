@@ -5,6 +5,9 @@ import com.ujjwalgarg.jobportal.exception.NotFoundException;
 import com.ujjwalgarg.jobportal.service.AuthService;
 import com.ujjwalgarg.jobportal.service.UserService;
 import com.ujjwalgarg.jobportal.util.JwtUtils;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
   private final AuthenticationManager authenticationManager;
   private final JwtUtils jwtUtils;
 
+
   @PreAuthorize("authenticated")
   @Transactional(readOnly = true)
   public User getAuthenticatedUser() throws NotFoundException {
@@ -40,7 +44,8 @@ public class AuthServiceImpl implements AuthService {
   }
 
   @Override
-  public String loginUser(String email, String password) throws BadCredentialsException {
+  public String loginUser(@Valid @Email String email, @Valid @NotNull String password)
+      throws BadCredentialsException {
     var authToken = new UsernamePasswordAuthenticationToken(email, password);
     Authentication authentication = authenticationManager.authenticate(authToken);
     SecurityContextHolder.getContext().setAuthentication(authentication);

@@ -9,5 +9,4 @@ public interface AuthService {
   User getAuthenticatedUser() throws NotFoundException;
 
   String loginUser(String email, String password) throws BadCredentialsException;
-
 }
