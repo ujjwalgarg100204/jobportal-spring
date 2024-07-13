@@ -2,6 +2,7 @@ package com.ujjwalgarg.jobportal.service.impl;
 
 import com.ujjwalgarg.jobportal.constant.ERole;
 import com.ujjwalgarg.jobportal.entity.CandidateProfile;
+import com.ujjwalgarg.jobportal.entity.Company;
 import com.ujjwalgarg.jobportal.entity.RecruiterProfile;
 import com.ujjwalgarg.jobportal.entity.Role;
 import com.ujjwalgarg.jobportal.entity.User;
@@ -10,6 +11,7 @@ import com.ujjwalgarg.jobportal.exception.NotFoundException;
 import com.ujjwalgarg.jobportal.repository.CandidateProfileRepository;
 import com.ujjwalgarg.jobportal.repository.RecruiterProfileRepository;
 import com.ujjwalgarg.jobportal.repository.UserRepository;
+import com.ujjwalgarg.jobportal.service.CompanyService;
 import com.ujjwalgarg.jobportal.service.RoleService;
 import com.ujjwalgarg.jobportal.service.UserService;
 import jakarta.validation.Valid;
@@ -34,6 +36,7 @@ public class UserServiceImpl implements UserService {
   private final CandidateProfileRepository cProfileRepository;
   private final RecruiterProfileRepository rProfileRepository;
   private final PasswordEncoder passwordEncoder;
+  private final CompanyService companyService;
 
   /**
    * Creates a new candidate user along with their profile.
@@ -86,6 +89,10 @@ public class UserServiceImpl implements UserService {
     User savedUser = this.userRepository.save(user);
     log.info("New recruiter created with id:{}", savedUser.getId());
 
+    if (rProfile.getCompany().getId() != null) {
+      Company company = companyService.getCompanyById(rProfile.getCompany().getId());
+      rProfile.setCompany(company);
+    }
     rProfile.setUser(savedUser);
     RecruiterProfile savedRProfile = rProfileRepository.save(rProfile);
     log.info(
