@@ -1,7 +1,7 @@
 package com.ujjwalgarg.jobportal.mapper;
 
-import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
 import com.ujjwalgarg.jobportal.entity.Company;
+import com.ujjwalgarg.jobportal.validator.validatable.CompanyDetailsValidatable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -14,5 +14,5 @@ public interface CompanyMapper {
   @Mapping(target = "id", source = "companyId")
   @Mapping(target = "name", source = "companyName")
   @Mapping(target = "hasLogo", constant = "false")
-  Company fromNewRecruiterRequest(NewRecruiterRequest request);
+  Company fromCompanyDetailsValidatable(CompanyDetailsValidatable request);
 }

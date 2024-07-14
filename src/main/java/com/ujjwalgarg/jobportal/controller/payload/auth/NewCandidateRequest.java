@@ -1,7 +1,6 @@
 package com.ujjwalgarg.jobportal.controller.payload.auth;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import org.hibernate.validator.constraints.URL;
 

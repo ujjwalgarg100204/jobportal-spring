@@ -6,11 +6,13 @@ import com.ujjwalgarg.jobportal.exception.AlreadyPresentException;
 import com.ujjwalgarg.jobportal.exception.NotFoundException;
 import com.ujjwalgarg.jobportal.repository.RoleRepository;
 import com.ujjwalgarg.jobportal.service.RoleService;
+import com.ujjwalgarg.jobportal.validator.Create;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Slf4j(topic = "ROLE_SERVICE")
 @Service
@@ -30,7 +32,7 @@ public class RoleServiceImpl implements RoleService {
     return this.roleRepository.existsByName(name);
   }
 
-  public Role createNew(@Valid Role role) {
+  public Role createNew(@Validated(Create.class) Role role) {
     // check if role already exists
     if (this.roleRepository.existsByName(role.getName())) {
       log.warn("Role {} already exists", role.getName());

@@ -1,89 +1,90 @@
 package com.ujjwalgarg.jobportal.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
 import com.ujjwalgarg.jobportal.entity.Address;
 import com.ujjwalgarg.jobportal.entity.Company;
+import com.ujjwalgarg.jobportal.validator.validatable.CompanyDetailsValidatable;
 import java.util.stream.Stream;
+import lombok.Builder;
+import lombok.Getter;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {CompanyMapperImpl.class, AddressMapperImpl.class})
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 class CompanyMapperTest {
 
   @Autowired
   private CompanyMapper companyMapper;
 
-  private static Stream<Arguments> provideNewRecruiterRequests() {
+  private static Stream<Arguments> companyMappingScenarios() {
     return Stream.of(
         Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter@example.com",
-                "securePassword",
-                "Jane",
-                "Smith",
-                1,
-                "Example Company",
-                "CityName",
-                "StateName",
-                "CountryName"
-            ),
+            "All fields present",
+            CompanyDetailsValidatableTestImpl.builder()
+                .companyId(1)
+                .companyName("Test Company")
+                .companyAddressCity("Test City")
+                .companyAddressState("Test State")
+                .companyAddressCountry("Test Country")
+                .build(),
             Company.builder()
                 .id(1)
-                .name("Example Company")
+                .name("Test Company")
+                .hasLogo(false)
                 .address(Address.builder()
-                    .city("CityName")
-                    .state("StateName")
-                    .country("CountryName")
+                    .city("Test City")
+                    .state("Test State")
+                    .country("Test Country")
                     .build())
+                .build()
+        ),
+        Arguments.of(
+            "Only mandatory fields present",
+            CompanyDetailsValidatableTestImpl.builder()
+                .companyId(2)
+                .companyName("Mandatory Company")
+                .build(),
+            Company.builder()
+                .id(2)
+                .name("Mandatory Company")
                 .hasLogo(false)
                 .build()
         ),
         Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter2@example.com",
-                "securePassword2",
-                "John",
-                "Doe",
-                null,
-                "Another Company",
-                "AnotherCity",
-                "AnotherState",
-                "AnotherCountry"
-            ),
-            Company.builder()
-                .name("Another Company")
-                .address(Address.builder()
-                    .city("AnotherCity")
-                    .state("AnotherState")
-                    .country("AnotherCountry")
-                    .build())
-                .hasLogo(false)
-                .build()
+            "All fields null",
+            CompanyDetailsValidatableTestImpl.builder().build(),
+            Company.builder().build()
         )
     );
   }
 
-  @ParameterizedTest
-  @MethodSource("provideNewRecruiterRequests")
-  @DisplayName("Test fromNewRecruiterRequest()")
-  void fromNewRecruiterRequest(NewRecruiterRequest request, Company expected) {
-    Company actual = companyMapper.fromNewRecruiterRequest(request);
+  @DisplayName("Company mapping scenarios")
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("companyMappingScenarios")
+  void testCompanyMapping(String scenario, CompanyDetailsValidatableTestImpl input,
+      Company expected) {
+    Company result = companyMapper.fromCompanyDetailsValidatable(input);
 
-    assertEquals(expected.getId(), actual.getId());
-    assertEquals(expected.getName(), actual.getName());
-    assertEquals(expected.getAddress(), actual.getAddress());
-    assertFalse(actual.getHasLogo());
-    assertNull(actual.getRecruiterProfile());
-    assertNull(actual.getJobs());
+    assertThat(result)
+        .usingRecursiveComparison()
+        .isEqualTo(expected);
   }
 
+  // Helper class to implement CompanyDetailsValidatable using Lombok
+  @Builder
+  @Getter
+  private static class CompanyDetailsValidatableTestImpl implements CompanyDetailsValidatable {
+
+    Integer companyId;
+    String companyName;
+    String companyAddressCity;
+    String companyAddressState;
+    String companyAddressCountry;
+  }
 }
