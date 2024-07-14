@@ -1,81 +1,75 @@
 package com.ujjwalgarg.jobportal.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewCandidateRequest;
 import com.ujjwalgarg.jobportal.entity.ContactInformation;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {ContactInformationMapperImpl.class})
+@SpringBootTest
 class ContactInformationMapperTest {
 
   @Autowired
   private ContactInformationMapper contactInformationMapper;
 
-  private static Stream<Arguments> provideNewCandidateRequests() {
+  private static Stream<Arguments> contactInformationMappingScenarios() {
     return Stream.of(
         Arguments.of(
-            new NewCandidateRequest(
-                "candidate@example.com",
-                "securePassword",
-                "John",
-                "Doe",
-                "A short description",
-                "https://twitter.com/johndoe",
-                "https://linkedin.com/in/johndoe",
-                "https://github.com/johndoe",
-                "1234567890"
-            ),
-            new ContactInformation(
-                null,
-                "1234567890",
-                "https://twitter.com/johndoe",
-                "https://linkedin.com/in/johndoe",
-                "https://github.com/johndoe"
-            )
+            "All fields present",
+            NewCandidateRequest.builder()
+                .twitterHandle("https://twitter.com/johndoe")
+                .linkedinHandle("https://linkedin.com/in/johndoe")
+                .githubHandle("https://github.com/johndoe")
+                .phone("1234567890")
+                .build(),
+            ContactInformation.builder()
+                .phone("1234567890")
+                .twitterHandle("https://twitter.com/johndoe")
+                .linkedinHandle("https://linkedin.com/in/johndoe")
+                .githubHandle("https://github.com/johndoe")
+                .build()
         ),
         Arguments.of(
-            new NewCandidateRequest(
-                "candidate2@example.com",
-                "securePassword2",
-                "Jane",
-                "Smith",
-                "Another short description",
-                "https://twitter.com/janesmith",
-                "https://linkedin.com/in/janesmith",
-                "https://github.com/janesmith",
-                null
-            ),
-            new ContactInformation(
-                null,
-                null,
-                "https://twitter.com/janesmith",
-                "https://linkedin.com/in/janesmith",
-                "https://github.com/janesmith"
-            )
+            "Without phone field",
+            NewCandidateRequest.builder()
+                .twitterHandle("https://twitter.com/janesmith")
+                .linkedinHandle("https://linkedin.com/in/janesmith")
+                .githubHandle("https://github.com/janesmith")
+                .build(),
+            ContactInformation.builder()
+                .twitterHandle("https://twitter.com/janesmith")
+                .linkedinHandle("https://linkedin.com/in/janesmith")
+                .githubHandle("https://github.com/janesmith")
+                .build()
+        ),
+        Arguments.of(
+            "All fields null",
+            NewCandidateRequest.builder().build(),
+            null
         )
     );
   }
 
-  @ParameterizedTest
-  @MethodSource("provideNewCandidateRequests")
-  @DisplayName("Test fromNewCandidateRequest()")
-  void fromNewCandidateRequest(NewCandidateRequest request, ContactInformation expected) {
-    ContactInformation actual = contactInformationMapper.fromNewCandidateRequest(request);
+  @DisplayName("Contact information mapping scenarios")
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("contactInformationMappingScenarios")
+  void testContactInformationMapping(String scenario, NewCandidateRequest input,
+      ContactInformation expected) {
+    ContactInformation result = contactInformationMapper.fromNewCandidateRequest(input);
 
-    assertNull(actual.getId());
-    assertEquals(expected.getPhone(), actual.getPhone());
-    assertEquals(expected.getTwitterHandle(), actual.getTwitterHandle());
-    assertEquals(expected.getLinkedinHandle(), actual.getLinkedinHandle());
-    assertEquals(expected.getGithubHandle(), actual.getGithubHandle());
+    assertThat(result)
+        .usingRecursiveComparison()
+        .ignoringFields("id")
+        .isEqualTo(expected);
+
+    if (result != null) {
+      assertThat(result.getId()).isNull();
+    }
   }
 }
