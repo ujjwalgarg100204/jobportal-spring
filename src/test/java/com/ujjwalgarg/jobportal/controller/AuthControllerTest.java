@@ -57,6 +57,102 @@ class AuthControllerTest {
     );
   }
 
+  private static Stream<Arguments> invalidCandidateRequests() {
+    return Stream.of(
+        // Empty email
+        Arguments.of(
+            NewCandidateRequest.builder().email("").password("password123").firstName("John")
+                .lastName("Doe").shortAbout("About").build(),
+            "email"),
+        // Invalid email format
+        Arguments.of(NewCandidateRequest.builder().email("invalid-email").password("password123")
+                .firstName("John").lastName("Doe").shortAbout("About").build(),
+            "email"),
+        // Empty password
+        Arguments.of(
+            NewCandidateRequest.builder().email("valid@email.com").password("").firstName("John")
+                .lastName("Doe").shortAbout("About").build(),
+            "password"),
+        // Empty first name
+        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
+                .firstName("").lastName("Doe").shortAbout("About").build(),
+            "firstName"),
+        // Empty last name
+        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
+                .firstName("John").lastName("").shortAbout("About").build(),
+            "lastName"),
+        // Empty short about
+        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
+                .firstName("John").lastName("Doe").shortAbout("").build(),
+            "shortAbout"),
+        // Invalid URL for Twitter handle
+        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
+                .firstName("John").lastName("Doe").shortAbout("About").twitterHandle("invalid-url")
+                .build(),
+            "twitterHandle"),
+        // Invalid URL for LinkedIn handle
+        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
+                .firstName("John").lastName("Doe").shortAbout("About").linkedinHandle("invalid-url")
+                .build(),
+            "linkedinHandle"),
+        // Invalid URL for GitHub handle
+        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
+                .firstName("John").lastName("Doe").shortAbout("About").githubHandle("invalid-url")
+                .build(),
+            "githubHandle")
+    );
+  }
+
+  private static Stream<Arguments> invalidRecruiterRequests() {
+    return Stream.of(
+        // Empty email
+        Arguments.of(
+            NewRecruiterRequest.builder().email("").password("password123").firstName("Jane")
+                .lastName("Smith").companyId(1).build(),
+            "email"),
+        // Invalid email format
+        Arguments.of(NewRecruiterRequest.builder().email("invalid-email").password("password123")
+                .firstName("Jane").lastName("Smith").companyId(1).build(),
+            "email"),
+        // Empty password
+        Arguments.of(
+            NewRecruiterRequest.builder().email("valid@email.com").password("").firstName("Jane")
+                .lastName("Smith").companyId(1).build(),
+            "password"),
+        // Empty first name
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("").lastName("Smith").companyId(1).build(),
+            "firstName"),
+        // Empty last name
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("").companyId(1).build(),
+            "lastName"),
+        // Company ID provided but also company name (should be mutually exclusive)
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("Smith").companyId(1).companyName("Test Company").build(),
+            "companyName"),
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("Smith").companyId(1).companyAddressCity("Test Company")
+                .build(),
+            "companyAddressCity"),
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("Smith").companyId(1).companyAddressState("Test Company")
+                .build(),
+            "companyAddressState"),
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("Smith").companyId(1).companyAddressCountry("Test Company")
+                .build(),
+            "companyAddressCountry"),
+        // No company ID and missing required company details
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("Smith").companyName("Test Company").build(),
+            "companyAddressState"),
+        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
+                .firstName("Jane").lastName("Smith").companyName("Test Company").build(),
+            "companyAddressCountry")
+    );
+  }
+
   @Test
   @DisplayName("Test loginUser() when given valid credentials, returns token and OK status")
   @Transactional
@@ -146,52 +242,6 @@ class AuthControllerTest {
         .andExpect(jsonPath("$.validationErrors[0].field").value(expectedInvalidField));
   }
 
-  private static Stream<Arguments> invalidCandidateRequests() {
-    return Stream.of(
-        // Empty email
-        Arguments.of(
-            NewCandidateRequest.builder().email("").password("password123").firstName("John")
-                .lastName("Doe").shortAbout("About").build(),
-            "email"),
-        // Invalid email format
-        Arguments.of(NewCandidateRequest.builder().email("invalid-email").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").build(),
-            "email"),
-        // Empty password
-        Arguments.of(
-            NewCandidateRequest.builder().email("valid@email.com").password("").firstName("John")
-                .lastName("Doe").shortAbout("About").build(),
-            "password"),
-        // Empty first name
-        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("").lastName("Doe").shortAbout("About").build(),
-            "firstName"),
-        // Empty last name
-        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("").shortAbout("About").build(),
-            "lastName"),
-        // Empty short about
-        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("").build(),
-            "shortAbout"),
-        // Invalid URL for Twitter handle
-        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").twitterHandle("invalid-url")
-                .build(),
-            "twitterHandle"),
-        // Invalid URL for LinkedIn handle
-        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").linkedinHandle("invalid-url")
-                .build(),
-            "linkedinHandle"),
-        // Invalid URL for GitHub handle
-        Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").githubHandle("invalid-url")
-                .build(),
-            "githubHandle")
-    );
-  }
-
   @Test
   @DisplayName("Test createNewRecruiter() Valid request with company ID creates a new recruiter")
   void createNewRecruiter_ValidRequestWithCompanyId_CreatesNewRecruiter() throws Exception {
@@ -252,55 +302,5 @@ class AuthControllerTest {
         .andExpect(jsonPath(
             String.format("$.validationErrors[?(@.field == '%s')].message",
                 expectedInvalidField)).exists());
-  }
-
-  private static Stream<Arguments> invalidRecruiterRequests() {
-    return Stream.of(
-        // Empty email
-        Arguments.of(
-            NewRecruiterRequest.builder().email("").password("password123").firstName("Jane")
-                .lastName("Smith").companyId(1).build(),
-            "email"),
-        // Invalid email format
-        Arguments.of(NewRecruiterRequest.builder().email("invalid-email").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).build(),
-            "email"),
-        // Empty password
-        Arguments.of(
-            NewRecruiterRequest.builder().email("valid@email.com").password("").firstName("Jane")
-                .lastName("Smith").companyId(1).build(),
-            "password"),
-        // Empty first name
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("").lastName("Smith").companyId(1).build(),
-            "firstName"),
-        // Empty last name
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("").companyId(1).build(),
-            "lastName"),
-        // Company ID provided but also company name (should be mutually exclusive)
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyName("Test Company").build(),
-            "companyName"),
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyAddressCity("Test Company")
-                .build(),
-            "companyAddressCity"),
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyAddressState("Test Company")
-                .build(),
-            "companyAddressState"),
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyAddressCountry("Test Company")
-                .build(),
-            "companyAddressCountry"),
-        // No company ID and missing required company details
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyName("Test Company").build(),
-            "companyAddressState"),
-        Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyName("Test Company").build(),
-            "companyAddressCountry")
-    );
   }
 }

@@ -70,8 +70,8 @@ public class RecruiterProfile {
 
   @NotNull(message = "Company must be defined for a recruiter", groups = {Create.class,
       Update.class})
-  @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST,
-      CascadeType.REFRESH}, optional = false)
+  @ManyToOne(optional = false, fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST,
+      CascadeType.MERGE, CascadeType.REFRESH, CascadeType.DETACH})
   @JoinColumn(name = "company_id", referencedColumnName = "id")
   private Company company;
 
