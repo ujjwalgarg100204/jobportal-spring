@@ -1,7 +1,7 @@
 package com.ujjwalgarg.jobportal.mapper;
 
-import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
 import com.ujjwalgarg.jobportal.entity.Address;
+import com.ujjwalgarg.jobportal.validator.validatable.CompanyDetailsValidatable;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
@@ -12,5 +12,5 @@ public interface AddressMapper {
   @Mapping(source = "companyAddressCity", target = "city")
   @Mapping(source = "companyAddressState", target = "state")
   @Mapping(source = "companyAddressCountry", target = "country")
-  Address fromNewRecruiterRequest(NewRecruiterRequest request);
+  Address fromCompanyDetailsValidatable(CompanyDetailsValidatable request);
 }

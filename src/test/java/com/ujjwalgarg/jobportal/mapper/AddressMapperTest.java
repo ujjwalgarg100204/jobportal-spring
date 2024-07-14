@@ -1,9 +1,11 @@
 package com.ujjwalgarg.jobportal.mapper;
 
-import static org.junit.jupiter.api.Assertions.*;
 
-import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.ujjwalgarg.jobportal.entity.Address;
+import com.ujjwalgarg.jobportal.mapper.impl.AddressMapperCustomImpl;
+import com.ujjwalgarg.jobportal.validator.validatable.CompanyDetailsValidatable;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,114 +17,130 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = AddressMapperImpl.class)
+@ContextConfiguration(classes = {AddressMapperCustomImpl.class, AddressMapperImpl.class})
 class AddressMapperTest {
 
   @Autowired
-  private AddressMapper addressMapper;
+  private AddressMapperCustomImpl addressMapper;
 
-  private static Stream<Arguments> provideNewRecruiterRequestSamples() {
+  private static Stream<Arguments> addressMappingScenarios() {
     return Stream.of(
         Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter1@example.com",
-                "password123",
-                "Alice",
-                "Johnson",
-                null,
-                "Tech Solutions Inc.",
-                "San Francisco",
-                "California",
-                "USA"
-            ),
+            "All fields present",
+            CompanyDetailsValidatableBuilder.builder()
+                .companyId(1)
+                .companyName("Test Company")
+                .companyAddressCity("Test City")
+                .companyAddressState("Test State")
+                .companyAddressCountry("Test Country")
+                .build(),
             Address.builder()
-                .city("San Francisco")
-                .state("California")
-                .country("USA")
+                .city("Test City")
+                .state("Test State")
+                .country("Test Country")
                 .build()
         ),
         Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter2@example.com",
-                "password456",
-                "Bob",
-                "Smith",
-                42,
-                "Company B",
-                "Los Angeles",
-                "California",
-                "USA"
-            ),
+            "Only mandatory fields present",
+            CompanyDetailsValidatableBuilder.builder()
+                .companyAddressState("Test State")
+                .companyAddressCountry("Test Country")
+                .build(),
             Address.builder()
-                .city("Los Angeles")
-                .state("California")
-                .country("USA")
+                .state("Test State")
+                .country("Test Country")
                 .build()
         ),
         Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter3@example.com",
-                "password789",
-                "Charlie",
-                "Brown",
-                null,
-                "Company C",
-                "Austin",
-                "Texas",
-                "USA"
-            ),
-            Address.builder()
-                .city("Austin")
-                .state("Texas")
-                .country("USA")
-                .build()
-        ),
-        Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter3@example.com",
-                "password789",
-                "Charlie",
-                "Brown",
-                null,
-                "Company C",
-                null,
-                "Texas",
-                "USA"
-            ),
-            Address.builder()
-                .city(null)
-                .state("Texas")
-                .country("USA")
-                .build()
-        ),
-        Arguments.of(
-            new NewRecruiterRequest(
-                "recruiter3@example.com",
-                "password789",
-                "Charlie",
-                "Brown",
-                null,
-                "Company C",
-                null,
-                null,
-                null
-            ),
-            new Address()
+            "All address fields null",
+            CompanyDetailsValidatableBuilder.builder()
+                .companyId(1)
+                .companyName("Test Company")
+                .build(),
+            null
         )
     );
   }
 
-  @ParameterizedTest
-  @MethodSource("provideNewRecruiterRequestSamples")
-  @DisplayName("Test fromNewRecruiterRequest()")
-  void testFromNewRecruiterRequest(NewRecruiterRequest request, Address expectedAddress) {
-    Address address = addressMapper.fromNewRecruiterRequest(request);
-
-    assertNotNull(address);
-    assertNull(address.getId());
-    assertEquals(expectedAddress.getCity(), address.getCity());
-    assertEquals(expectedAddress.getState(), address.getState());
-    assertEquals(expectedAddress.getCountry(), address.getCountry());
+  @DisplayName("Address mapping scenarios")
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("addressMappingScenarios")
+  void testAddressMapping(String scenario, CompanyDetailsValidatable input, Address expected) {
+    Address result = addressMapper.fromCompanyDetailsValidatable(input);
+    assertThat(result)
+        .usingRecursiveComparison()
+        .ignoringFields("id")
+        .isEqualTo(expected);
   }
 
+  // Helper class to build CompanyDetailsValidatable instances
+  private static class CompanyDetailsValidatableBuilder {
+
+    private Integer companyId;
+    private String companyName;
+    private String companyAddressCity;
+    private String companyAddressState;
+    private String companyAddressCountry;
+
+    private CompanyDetailsValidatableBuilder() {
+    }
+
+    public static CompanyDetailsValidatableBuilder builder() {
+      return new CompanyDetailsValidatableBuilder();
+    }
+
+    public CompanyDetailsValidatableBuilder companyId(Integer companyId) {
+      this.companyId = companyId;
+      return this;
+    }
+
+    public CompanyDetailsValidatableBuilder companyName(String companyName) {
+      this.companyName = companyName;
+      return this;
+    }
+
+    public CompanyDetailsValidatableBuilder companyAddressCity(String companyAddressCity) {
+      this.companyAddressCity = companyAddressCity;
+      return this;
+    }
+
+    public CompanyDetailsValidatableBuilder companyAddressState(String companyAddressState) {
+      this.companyAddressState = companyAddressState;
+      return this;
+    }
+
+    public CompanyDetailsValidatableBuilder companyAddressCountry(String companyAddressCountry) {
+      this.companyAddressCountry = companyAddressCountry;
+      return this;
+    }
+
+    public CompanyDetailsValidatable build() {
+      return new CompanyDetailsValidatable() {
+        @Override
+        public Integer getCompanyId() {
+          return companyId;
+        }
+
+        @Override
+        public String getCompanyName() {
+          return companyName;
+        }
+
+        @Override
+        public String getCompanyAddressCity() {
+          return companyAddressCity;
+        }
+
+        @Override
+        public String getCompanyAddressState() {
+          return companyAddressState;
+        }
+
+        @Override
+        public String getCompanyAddressCountry() {
+          return companyAddressCountry;
+        }
+      };
+    }
+  }
 }
