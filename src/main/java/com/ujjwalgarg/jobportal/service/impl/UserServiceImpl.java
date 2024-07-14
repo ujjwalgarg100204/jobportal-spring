@@ -14,14 +14,15 @@ import com.ujjwalgarg.jobportal.repository.UserRepository;
 import com.ujjwalgarg.jobportal.service.CompanyService;
 import com.ujjwalgarg.jobportal.service.RoleService;
 import com.ujjwalgarg.jobportal.service.UserService;
+import com.ujjwalgarg.jobportal.validator.Create;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 
 /**
  * UserService
@@ -47,7 +48,8 @@ public class UserServiceImpl implements UserService {
    * @throws NotFoundException       if the candidate role is not found in the system.
    */
   @Transactional
-  public void createNewCandidate(@Valid User user, @Valid CandidateProfile cProfile)
+  public void createNewCandidate(@Validated(Create.class) User user,
+      @Validated(Create.class) CandidateProfile cProfile)
       throws AlreadyPresentException {
     // check if candidate already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
@@ -72,7 +74,8 @@ public class UserServiceImpl implements UserService {
   }
 
   @Transactional
-  public void createNewRecruiter(@Valid User user, @Valid RecruiterProfile rProfile)
+  public void createNewRecruiter(@Validated(Create.class) User user,
+      @Validated(Create.class) RecruiterProfile rProfile)
       throws AlreadyPresentException {
     // check if user already exists
     if (this.userRepository.existsByEmail(user.getEmail())) {
@@ -107,5 +110,13 @@ public class UserServiceImpl implements UserService {
           log.error("User with email:{} not found", email);
           return new NotFoundException("User with email:" + email + " not found");
         });
+  }
+
+  @Override
+  public User getUserById(int id) throws NotFoundException {
+    return this.userRepository.findById(id).orElseThrow(() -> {
+      log.error("User with id:{} not found", id);
+      return new NotFoundException("User with id:" + id + " not found");
+    });
   }
 }

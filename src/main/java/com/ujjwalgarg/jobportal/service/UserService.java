@@ -13,4 +13,6 @@ public interface UserService {
   void createNewRecruiter(User user, RecruiterProfile rProfile) throws AlreadyPresentException;
 
   User getUserByEmail(String email) throws NotFoundException;
+
+  User getUserById(int id) throws NotFoundException;
 }
