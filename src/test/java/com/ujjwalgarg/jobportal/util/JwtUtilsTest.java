@@ -15,12 +15,11 @@ import org.springframework.test.util.ReflectionTestUtils;
 @ExtendWith(MockitoExtension.class)
 class JwtUtilsTest {
 
-  @InjectMocks
-  private JwtUtils jwtUtils;
-
   private final String testSecret = Base64.getEncoder()
       .encodeToString("B6YL8ZcFm03yFLVrmGJkrwsRSNo0Y6sdWw5bZ1apuLI=".getBytes());
   private final int testExpirationMs = 60000; // 1 minute
+  @InjectMocks
+  private JwtUtils jwtUtils;
 
   @BeforeEach
   void setUp() {

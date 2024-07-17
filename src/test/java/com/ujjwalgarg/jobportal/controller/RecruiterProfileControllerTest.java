@@ -67,6 +67,172 @@ class RecruiterProfileControllerTest {
   @Autowired
   private ObjectMapper objectMapper;
 
+  static Stream<Arguments> profileInvalidFields() {
+    return Stream.of(
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .firstName("Jane")
+                .lastName("Smith")
+                .about("Updated about")
+                .companyId(1)
+                .build()
+        ), // missing id
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("")
+                .lastName("Smith")
+                .about("Updated about")
+                .companyId(1)
+                .build()
+        ),// First Name is mandatory
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("Jane")
+                .lastName("")
+                .about("Updated about")
+                .companyId(1)
+                .build()
+        ),// Last Name is mandatory
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("Jane")
+                .lastName("Smith")
+                .about("a".repeat(10001))
+                .companyId(1)
+                .build()
+        ), // Maximum number of characters allowed is 10,000
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("Jane")
+                .lastName("Smith")
+                .about("Updated about")
+                .companyId(1)
+                .companyName("SomeCompany")
+                .build()
+        ),// Company name must be null if company ID is specified.
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("Jane")
+                .lastName("Smith")
+                .about("Updated about")
+                .companyId(1)
+                .companyAddressState("CA")
+                .build()
+        ),// Company state must be null if company ID is specified.
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("Jane")
+                .lastName("Smith")
+                .about("Updated about")
+                .companyId(1)
+                .companyAddressCountry("USA")
+                .build()
+        ),// Company country must be null if company ID is specified.
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("John")
+                .lastName("Doe")
+                .about("About text")
+                .companyId(1)
+                .address(Address.builder()
+                    .state("")
+                    .country("Country")
+                    .build())
+                .build()
+        ),// Invalid: state is blank
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("John")
+                .lastName("Doe")
+                .about("About text")
+                .companyId(1)
+                .address(Address.builder()
+                    .state("State")
+                    .country("")
+                    .build())
+                .build()
+        ),// Invalid: country is blank
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("John")
+                .lastName("Doe")
+                .about("About text")
+                .companyId(1)
+                .contactInformation(ContactInformation.builder()
+                    .linkedinHandle("invalid-url")
+                    .build())
+                .build()
+        ),// Invalid: URL is malformed
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("John")
+                .lastName("Doe")
+                .about("About text")
+                .companyId(1)
+                .educations(List.of(
+                    Education.builder()
+                        .title("")
+                        .description("Description")
+                        .build()))
+                .build()
+        ),// Invalid: title is blank
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("John")
+                .lastName("Doe")
+                .about("About text")
+                .companyId(1)
+                .educations(List.of(
+                    Education.builder()
+                        .title("Title")
+                        .description("")
+                        .build()))
+                .build()
+        ),// Invalid: description is blank
+        Arguments.of(
+            RecruiterProfileUpdateDTO.builder()
+                .id(1)
+                .firstName("John")
+                .lastName("Doe")
+                .about("About text")
+                .companyId(1)
+                .interests(List.of(
+                    Interest.builder()
+                        .title("")
+                        .build()))
+                .build()
+        )// Invalid: title is blank
+    );
+  }
+
+  static Stream<Arguments> provideInvalidProfilePhotoMultipartFiles() {
+    return Stream.of(
+        Arguments.of(
+            new MockMultipartFile("profilePhoto", "profile.txt", "text/plain",
+                "invalid content".getBytes())  // Invalid content type
+        ),
+        Arguments.of(
+            new MockMultipartFile("profilePhoto", "profile.jpg", "image/jpeg", new byte[0])
+            // File size must be between 100 bytes and 5 MB
+        ),
+        Arguments.of(
+            new MockMultipartFile("profilePhoto", "profile.jpg", "image/jpeg", new byte[6000000])
+            // File size must be between 100 bytes and 5 MB
+        )
+    );
+  }
+
   @BeforeEach
   void setUp() {
     when(service.uploadFile(any(), any())).thenReturn(true);
@@ -247,7 +413,6 @@ class RecruiterProfileControllerTest {
     assertThat(updatedInterests.get(1).getTitle()).isEqualTo("New Interest 1");
     assertThat(updatedInterests.get(2).getTitle()).isEqualTo("New Interest 2");
   }
-
 
   @SqlGroup({
       @Sql(scripts = "/seed-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
@@ -435,7 +600,6 @@ class RecruiterProfileControllerTest {
         dto.getCompanyAddressCountry());
   }
 
-
   @SqlGroup({
       @Sql(scripts = "/seed-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
   })
@@ -492,155 +656,6 @@ class RecruiterProfileControllerTest {
     assertThat(updatedProfile.getCompany()).isEqualTo(existingProfile.getCompany());
   }
 
-  static Stream<Arguments> profileInvalidFields() {
-    return Stream.of(
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .firstName("Jane")
-                .lastName("Smith")
-                .about("Updated about")
-                .companyId(1)
-                .build()
-        ), // missing id
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("")
-                .lastName("Smith")
-                .about("Updated about")
-                .companyId(1)
-                .build()
-        ),// First Name is mandatory
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("Jane")
-                .lastName("")
-                .about("Updated about")
-                .companyId(1)
-                .build()
-        ),// Last Name is mandatory
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("Jane")
-                .lastName("Smith")
-                .about("a".repeat(10001))
-                .companyId(1)
-                .build()
-        ), // Maximum number of characters allowed is 10,000
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("Jane")
-                .lastName("Smith")
-                .about("Updated about")
-                .companyId(1)
-                .companyName("SomeCompany")
-                .build()
-        ),// Company name must be null if company ID is specified.
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("Jane")
-                .lastName("Smith")
-                .about("Updated about")
-                .companyId(1)
-                .companyAddressState("CA")
-                .build()
-        ),// Company state must be null if company ID is specified.
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("Jane")
-                .lastName("Smith")
-                .about("Updated about")
-                .companyId(1)
-                .companyAddressCountry("USA")
-                .build()
-        ),// Company country must be null if company ID is specified.
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .about("About text")
-                .companyId(1)
-                .address(Address.builder()
-                    .state("")
-                    .country("Country")
-                    .build())
-                .build()
-        ),// Invalid: state is blank
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .about("About text")
-                .companyId(1)
-                .address(Address.builder()
-                    .state("State")
-                    .country("")
-                    .build())
-                .build()
-        ),// Invalid: country is blank
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .about("About text")
-                .companyId(1)
-                .contactInformation(ContactInformation.builder()
-                    .linkedinHandle("invalid-url")
-                    .build())
-                .build()
-        ),// Invalid: URL is malformed
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .about("About text")
-                .companyId(1)
-                .educations(List.of(
-                    Education.builder()
-                        .title("")
-                        .description("Description")
-                        .build()))
-                .build()
-        ),// Invalid: title is blank
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .about("About text")
-                .companyId(1)
-                .educations(List.of(
-                    Education.builder()
-                        .title("Title")
-                        .description("")
-                        .build()))
-                .build()
-        ),// Invalid: description is blank
-        Arguments.of(
-            RecruiterProfileUpdateDTO.builder()
-                .id(1)
-                .firstName("John")
-                .lastName("Doe")
-                .about("About text")
-                .companyId(1)
-                .interests(List.of(
-                    Interest.builder()
-                        .title("")
-                        .build()))
-                .build()
-        )// Invalid: title is blank
-    );
-  }
-
   @ParameterizedTest
   @MethodSource("profileInvalidFields")
   @WithMockRecruiter
@@ -655,23 +670,6 @@ class RecruiterProfileControllerTest {
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(jsonPath("$.validationErrors").isArray())
         .andExpect(jsonPath("$.validationErrors[0]").isString());
-  }
-
-  static Stream<Arguments> provideInvalidProfilePhotoMultipartFiles() {
-    return Stream.of(
-        Arguments.of(
-            new MockMultipartFile("profilePhoto", "profile.txt", "text/plain",
-                "invalid content".getBytes())  // Invalid content type
-        ),
-        Arguments.of(
-            new MockMultipartFile("profilePhoto", "profile.jpg", "image/jpeg", new byte[0])
-            // File size must be between 100 bytes and 5 MB
-        ),
-        Arguments.of(
-            new MockMultipartFile("profilePhoto", "profile.jpg", "image/jpeg", new byte[6000000])
-            // File size must be between 100 bytes and 5 MB
-        )
-    );
   }
 
   @ParameterizedTest

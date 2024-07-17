@@ -13,14 +13,12 @@ import org.springframework.test.context.ContextConfiguration;
 @ContextConfiguration
 public abstract class SecurityContextServiceTest {
 
-  @MockBean
-  protected UserService userService;
-
-  @MockBean
-  protected JwtUtils jwtUtils;
-
   protected static final String CANDIDATE_EMAIL = "candidate@gmail.com";
   protected static final String RECRUITER_EMAIL = "recruiter@gmail.com";
   protected static final String PASSWORD = "password";
+  @MockBean
+  protected UserService userService;
+  @MockBean
+  protected JwtUtils jwtUtils;
 
 }
