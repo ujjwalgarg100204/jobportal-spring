@@ -108,48 +108,37 @@ class AuthControllerTest {
         // Empty email
         Arguments.of(
             NewRecruiterRequest.builder().email("").password("password123").firstName("Jane")
-                .lastName("Smith").companyId(1).build(),
-            "email"),
+                .lastName("Smith").companyId(1).build()),
         // Invalid email format
         Arguments.of(NewRecruiterRequest.builder().email("invalid-email").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).build(),
-            "email"),
+            .firstName("Jane").lastName("Smith").companyId(1).build()),
         // Empty password
         Arguments.of(
             NewRecruiterRequest.builder().email("valid@email.com").password("").firstName("Jane")
-                .lastName("Smith").companyId(1).build(),
-            "password"),
+                .lastName("Smith").companyId(1).build()),
         // Empty first name
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("").lastName("Smith").companyId(1).build(),
-            "firstName"),
+            .firstName("").lastName("Smith").companyId(1).build()),
         // Empty last name
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("").companyId(1).build(),
-            "lastName"),
+            .firstName("Jane").lastName("").companyId(1).build()),
         // Company ID provided but also company name (should be mutually exclusive)
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyName("Test Company").build(),
-            "companyName"),
+            .firstName("Jane").lastName("Smith").companyId(1).companyName("Test Company").build()),
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyAddressCity("Test Company")
-                .build(),
-            "companyAddressCity"),
+            .firstName("Jane").lastName("Smith").companyId(1).companyAddressCity("Test Company")
+            .build()),
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyAddressState("Test Company")
-                .build(),
-            "companyAddressState"),
+            .firstName("Jane").lastName("Smith").companyId(1).companyAddressState("Test Company")
+            .build()),
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyId(1).companyAddressCountry("Test Company")
-                .build(),
-            "companyAddressCountry"),
+            .firstName("Jane").lastName("Smith").companyId(1).companyAddressCountry("Test Company")
+            .build()),
         // No company ID and missing required company details
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyName("Test Company").build(),
-            "companyAddressState"),
+            .firstName("Jane").lastName("Smith").companyName("Test Company").build()),
         Arguments.of(NewRecruiterRequest.builder().email("valid@email.com").password("password123")
-                .firstName("Jane").lastName("Smith").companyName("Test Company").build(),
-            "companyAddressCountry")
+            .firstName("Jane").lastName("Smith").companyName("Test Company").build())
     );
   }
 
@@ -236,10 +225,7 @@ class AuthControllerTest {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(jsonPath("$.message").isString())
-        .andExpect(jsonPath("$.validationErrors").hasJsonPath())
-        .andExpect(jsonPath("$.validationErrors").isArray())
-        .andExpect(jsonPath("$.validationErrors[0].message").isString())
-        .andExpect(jsonPath("$.validationErrors[0].field").value(expectedInvalidField));
+        .andExpect(jsonPath("$.validationErrors").isArray());
   }
 
   @Test
@@ -287,20 +273,14 @@ class AuthControllerTest {
   @ParameterizedTest
   @MethodSource("invalidRecruiterRequests")
   @DisplayName("Test createNewRecruiter() Invalid request returns appropriate error")
-  void createNewRecruiter_InvalidRequest_ReturnsError(NewRecruiterRequest invalidRequest,
-      String expectedInvalidField) throws Exception {
+  void createNewRecruiter_InvalidRequest_ReturnsError(NewRecruiterRequest invalidRequest)
+      throws Exception {
     mockMvc.perform(post("/api/auth/recruiter")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(jsonPath("$.message").isString())
-        .andExpect(jsonPath("$.validationErrors").exists())
-        .andExpect(jsonPath("$.validationErrors").isArray())
-        .andExpect(jsonPath(
-            String.format("$.validationErrors[?(@.field == '%s')]", expectedInvalidField)).exists())
-        .andExpect(jsonPath(
-            String.format("$.validationErrors[?(@.field == '%s')].message",
-                expectedInvalidField)).exists());
+        .andExpect(jsonPath("$.validationErrors").isArray());
   }
 }

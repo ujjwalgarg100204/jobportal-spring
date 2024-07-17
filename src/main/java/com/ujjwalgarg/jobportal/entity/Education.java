@@ -1,7 +1,5 @@
 package com.ujjwalgarg.jobportal.entity;
 
-import com.ujjwalgarg.jobportal.validator.Create;
-import com.ujjwalgarg.jobportal.validator.Update;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -20,8 +18,6 @@ import lombok.NoArgsConstructor;
 @Table(name = "education")
 public class Education {
 
-  @Null(groups = Create.class)
-  @NotNull(groups = Update.class)
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "id")

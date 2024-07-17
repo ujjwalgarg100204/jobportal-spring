@@ -2,7 +2,9 @@ package com.ujjwalgarg.jobportal.controlleradvice;
 
 import com.ujjwalgarg.jobportal.controller.payload.Response;
 import java.util.Arrays;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.ConversionNotSupportedException;
+import org.springframework.beans.InvalidPropertyException;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -17,12 +19,14 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
+@Slf4j(topic = "GLOBAL_EXCEPTION_HANDLER")
 @ControllerAdvice
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -79,7 +83,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       HttpHeaders headers, HttpStatusCode status, WebRequest request) {
     var response = Response.failure("Validation failed");
     for (FieldError err : ex.getFieldErrors()) {
-      response.addValidationError(err.getField(), err.getDefaultMessage());
+      response.addValidationError(err.getDefaultMessage());
     }
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
@@ -92,8 +96,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     ex.getAllValidationResults()
         .stream()
         .flatMap(result -> result.getResolvableErrors().stream())
-        .forEach(error -> response.addValidationError(Arrays.toString(error.getArguments()),
-            error.getDefaultMessage()));
+        .forEach(error -> response.addValidationError(error.getDefaultMessage()));
 
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
@@ -144,8 +147,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     var response = Response.failure("Method validation failed");
     ex.getAllValidationResults().stream()
         .flatMap(result -> result.getResolvableErrors().stream())
-        .forEach(error -> response.addValidationError(Arrays.toString(error.getArguments()),
-            error.getDefaultMessage()));
+        .forEach(error -> response.addValidationError(error.getDefaultMessage()));
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
   }
 
@@ -157,4 +159,12 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     return ResponseEntity.status(statusCode).body(response);
   }
 
+  @ExceptionHandler(InvalidPropertyException.class)
+  public ResponseEntity<Response<Void>> handleInvalidPropertyException(
+      InvalidPropertyException ex) {
+    log.error("Validation error", ex);
+    var response = Response.<Void>failure("Validation error");
+    response.addValidationError(ex.getMessage());
+    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+  }
 }

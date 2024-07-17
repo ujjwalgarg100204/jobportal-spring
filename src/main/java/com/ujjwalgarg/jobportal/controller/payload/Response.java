@@ -16,7 +16,7 @@ public class Response<T> {
   private T data;
 
   @JsonInclude(Include.NON_NULL)
-  private List<ValidationError> validationErrors;
+  private List<String> validationErrors;
 
   public static <T> Response<T> success(T data, String message) {
     var response = new Response<T>(true, message);
@@ -28,16 +28,11 @@ public class Response<T> {
     return new Response<>(false, message);
   }
 
-  public void addValidationError(String field, String message) {
+  public void addValidationError(String message) {
     if (this.validationErrors == null) {
       this.validationErrors = new ArrayList<>();
     }
 
-    var validationError = new ValidationError(field, message);
-    this.validationErrors.add(validationError);
-  }
-
-  private record ValidationError(String field, String message) {
-
+    this.validationErrors.add(message);
   }
 }
