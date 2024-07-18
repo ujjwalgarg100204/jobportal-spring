@@ -124,6 +124,9 @@ VALUES (2, 'Content Marketing', '2', 'INTERMEDIATE', 2);
 INSERT INTO skill (id, name, years_of_experience, experience_level, candidate_profile_id)
 VALUES (3, 'Adobe Photoshop', '1', 'BEGINNER', 3);
 
--- Add Skill to recruiter with id 3
+-- Add interest to recruiter with id 3
 INSERT INTO recruiter_interest(recruiter_id, id)
 VALUES (2, 1);
+-- Add interest to candidate with id 1
+INSERT INTO candidate_interest(candidate_id, id)
+VALUES (1, 2);

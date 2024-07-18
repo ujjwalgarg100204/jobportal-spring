@@ -244,7 +244,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Update address")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_UpdateAddress() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -282,7 +281,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Update contact information")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_UpdateContactInformation() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -322,7 +320,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Delete interests")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_DeleteInterests() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -348,7 +345,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Update existing interests")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_UpdateExistingInterests() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -386,7 +382,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Create new interests")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_CreateNewInterests() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -419,7 +414,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Deletes education if id is missing")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_DeletesExistingEducations_WhenIdIsMissing() throws Exception {
     // save some education to profile
@@ -462,7 +456,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Update existing educations")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_UpdateExistingEducations() throws Exception {
     // save some education to profile
@@ -524,7 +517,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Create new educations")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_CreateNewEducations() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -559,7 +551,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Update with a new company creation")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_CreateNewCompany() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -605,7 +596,6 @@ class RecruiterProfileControllerTest {
   })
   @Test
   @DisplayName("Update firstName, lastName, and about fields")
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_ChangeNameAndAbout() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -635,7 +625,6 @@ class RecruiterProfileControllerTest {
       @Sql(scripts = "/seed-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
   })
   @Test
-  @WithMockRecruiter
   @Transactional
   void updateRecruiterProfile_withValidCompanyId_ReturnsOk() throws Exception {
     var existingProfile = recruiterProfileRepository.findById(2).orElseThrow();
@@ -658,7 +647,6 @@ class RecruiterProfileControllerTest {
 
   @ParameterizedTest
   @MethodSource("profileInvalidFields")
-  @WithMockRecruiter
   void updateRecruiterProfile_whenInvalidFields_ReturnsBadRequest(RecruiterProfileUpdateDTO dto)
       throws Exception {
     var requestBuilder = multipart(HttpMethod.PATCH, "/api/recruiter/profile")
@@ -674,7 +662,6 @@ class RecruiterProfileControllerTest {
 
   @ParameterizedTest
   @MethodSource("provideInvalidProfilePhotoMultipartFiles")
-  @WithMockRecruiter
   void updateRecruiterProfile_whenInvalidProfilePhoto_ReturnsBadRequest(MockMultipartFile file)
       throws Exception {
     var dto = getRecruiterProfileUpdateDTO(null);
