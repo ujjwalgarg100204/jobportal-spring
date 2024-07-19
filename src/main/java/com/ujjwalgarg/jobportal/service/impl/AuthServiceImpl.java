@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
   private final JwtUtils jwtUtils;
 
 
-  @PreAuthorize("authenticated")
+  @PreAuthorize("isAuthenticated()")
   @Transactional(readOnly = true)
   public User getAuthenticatedUser() throws NotFoundException {
     UserDetails userDetails =

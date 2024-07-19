@@ -1,9 +1,11 @@
 package com.ujjwalgarg.jobportal.controller;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ujjwalgarg.jobportal.annotation.WithMockCandidate;
 import com.ujjwalgarg.jobportal.controller.payload.auth.LoginRequest;
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewCandidateRequest;
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
@@ -16,9 +18,11 @@ import java.util.stream.Stream;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -27,6 +31,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlGroup;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQLDB)
 @AutoConfigureMockMvc
 @ContextConfiguration
+@ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
 
   @Autowired
@@ -45,6 +52,7 @@ class AuthControllerTest {
 
   @Autowired
   private UserService userService;
+
   @Autowired
   private CompanyRepository companyRepository;
 
@@ -62,44 +70,35 @@ class AuthControllerTest {
         // Empty email
         Arguments.of(
             NewCandidateRequest.builder().email("").password("password123").firstName("John")
-                .lastName("Doe").shortAbout("About").build(),
-            "email"),
+                .lastName("Doe").shortAbout("About").build()),
         // Invalid email format
         Arguments.of(NewCandidateRequest.builder().email("invalid-email").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").build(),
-            "email"),
+            .firstName("John").lastName("Doe").shortAbout("About").build()),
         // Empty password
         Arguments.of(
             NewCandidateRequest.builder().email("valid@email.com").password("").firstName("John")
-                .lastName("Doe").shortAbout("About").build(),
-            "password"),
+                .lastName("Doe").shortAbout("About").build()),
         // Empty first name
         Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("").lastName("Doe").shortAbout("About").build(),
-            "firstName"),
+            .firstName("").lastName("Doe").shortAbout("About").build()),
         // Empty last name
         Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("").shortAbout("About").build(),
-            "lastName"),
+            .firstName("John").lastName("").shortAbout("About").build()),
         // Empty short about
         Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("").build(),
-            "shortAbout"),
+            .firstName("John").lastName("Doe").shortAbout("").build()),
         // Invalid URL for Twitter handle
         Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").twitterHandle("invalid-url")
-                .build(),
-            "twitterHandle"),
+            .firstName("John").lastName("Doe").shortAbout("About").twitterHandle("invalid-url")
+            .build()),
         // Invalid URL for LinkedIn handle
         Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").linkedinHandle("invalid-url")
-                .build(),
-            "linkedinHandle"),
+            .firstName("John").lastName("Doe").shortAbout("About").linkedinHandle("invalid-url")
+            .build()),
         // Invalid URL for GitHub handle
         Arguments.of(NewCandidateRequest.builder().email("valid@email.com").password("password123")
-                .firstName("John").lastName("Doe").shortAbout("About").githubHandle("invalid-url")
-                .build(),
-            "githubHandle")
+            .firstName("John").lastName("Doe").shortAbout("About").githubHandle("invalid-url")
+            .build())
     );
   }
 
@@ -146,7 +145,7 @@ class AuthControllerTest {
   @DisplayName("Test loginUser() when given valid credentials, returns token and OK status")
   @Transactional
   void loginUser_WithValidCredentials_ReturnsTokenAndOkStatus() throws Exception {
-    var user = User.builder().email("candidate@gmail.com").password("password").build();
+    var user = User.builder().email("candidate@example.com").password("password").build();
     var cProfile = CandidateProfile.builder().firstName("Seymour").lastName("Jakubowski").build();
     userService.createNewCandidate(user, cProfile);
     LoginRequest validLoginRequest = new LoginRequest(user.getEmail(), "password");
@@ -217,8 +216,8 @@ class AuthControllerTest {
   @ParameterizedTest
   @MethodSource("invalidCandidateRequests")
   @DisplayName("Test createNewCandidate() Invalid request returns appropriate error")
-  void createNewCandidate_InvalidRequest_ReturnsError(NewCandidateRequest invalidRequest,
-      String expectedInvalidField) throws Exception {
+  void createNewCandidate_InvalidRequest_ReturnsError(NewCandidateRequest invalidRequest)
+      throws Exception {
     mockMvc.perform(post("/api/auth/candidate")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(invalidRequest)))
@@ -233,7 +232,7 @@ class AuthControllerTest {
   void createNewRecruiter_ValidRequestWithCompanyId_CreatesNewRecruiter() throws Exception {
     var company = companyRepository.save(Company.builder().name("Mosciski Inc").build());
     NewRecruiterRequest validRequest = NewRecruiterRequest.builder()
-        .email("recruiter@example.com")
+        .email("recruiter@gmail.com")
         .password("password123")
         .firstName("Jane")
         .lastName("Smith")
@@ -282,5 +281,31 @@ class AuthControllerTest {
         .andExpect(jsonPath("$.success").value(false))
         .andExpect(jsonPath("$.message").isString())
         .andExpect(jsonPath("$.validationErrors").isArray());
+  }
+
+  @SqlGroup({
+      @Sql(scripts = "/seed-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+  })
+  @Test
+  @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.HSQLDB)
+  @DisplayName("Test getCurrentSession() returns current user session when authenticated")
+  @WithMockCandidate
+  void getCurrentSession_WhenAuthenticated_ReturnsUserSession() throws Exception {
+    mockMvc.perform(get("/api/auth/session"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").isString())
+        .andExpect(jsonPath("$.data.id").value(1))
+        .andExpect(jsonPath("$.data.email").value("candidate@gmail.com"))
+        .andExpect(jsonPath("$.data.registrationDate").isNotEmpty())
+        .andExpect(jsonPath("$.data.role.name").value("ROLE_CANDIDATE"));
+  }
+
+  @Test
+  @DisplayName("Test getCurrentSession() returns unauthorized when not authenticated")
+  void getCurrentSession_WhenNotAuthenticated_ReturnsUnauthorized() throws Exception {
+    mockMvc.perform(get("/api/auth/session")
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized()).andDo(print());
   }
 }

@@ -8,7 +8,7 @@ VALUES (3, 'Toronto', 'Ontario', 'Canada');
 
 -- Populate User table
 INSERT INTO user (id, email, password, registration_date, role_id)
-VALUES (1, 'candidate@example.com', 'password', '2024-07-14', 1);
+VALUES (1, 'candidate@gmail.com', 'password', '2024-07-14', 1);
 INSERT INTO user (id, email, password, role_id)
 VALUES (2, 'recruiter@example.com', 'password', 2);
 INSERT INTO user (id, email, password, registration_date, role_id)

@@ -4,8 +4,10 @@ import com.ujjwalgarg.jobportal.controller.payload.Response;
 import com.ujjwalgarg.jobportal.controller.payload.auth.LoginRequest;
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewCandidateRequest;
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewRecruiterRequest;
+import com.ujjwalgarg.jobportal.controller.payload.common.UserDto;
 import com.ujjwalgarg.jobportal.entity.CandidateProfile;
 import com.ujjwalgarg.jobportal.entity.User;
+import com.ujjwalgarg.jobportal.mapper.AuthMapper;
 import com.ujjwalgarg.jobportal.mapper.CandidateProfileMapper;
 import com.ujjwalgarg.jobportal.mapper.RecruiterProfileMapper;
 import com.ujjwalgarg.jobportal.mapper.UserMapper;
@@ -16,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +42,7 @@ public class AuthController {
   private final UserMapper userMapper;
   private final RecruiterProfileMapper recruiterProfileMapper;
   private final CandidateProfileMapper candidateProfileMapper;
+  private final AuthMapper authMapper;
 
   @PostMapping("/login")
   public ResponseEntity<Response<String>> loginUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -73,4 +78,13 @@ public class AuthController {
     return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
+  @PreAuthorize("isAuthenticated()")
+  @GetMapping(value = "/session", consumes = MediaType.ALL_VALUE)
+  public ResponseEntity<Response<UserDto>> getCurrentSession() {
+    User user = this.authService.getAuthenticatedUser();
+
+    var response = Response.success(this.authMapper.fromUserToUserDto(user),
+        "Successfully retrieved current session");
+    return ResponseEntity.ok(response);
+  }
 }
