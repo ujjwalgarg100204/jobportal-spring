@@ -3,6 +3,7 @@ package com.ujjwalgarg.jobportal.controller;
 import com.ujjwalgarg.jobportal.annotation.FileContentType;
 import com.ujjwalgarg.jobportal.annotation.FileSize;
 import com.ujjwalgarg.jobportal.controller.payload.Response;
+import com.ujjwalgarg.jobportal.controller.payload.candidateprofile.CandidateProfileGetRequestDto;
 import com.ujjwalgarg.jobportal.service.CandidateProfileService;
 import com.ujjwalgarg.jobportal.service.dto.candidateprofileservice.CandidateProfileUpdateDTO;
 import jakarta.validation.Valid;
@@ -11,11 +12,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
 
 @RestController
 @RequestMapping(path = "/api/candidate/profile", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -34,6 +38,16 @@ public class CandidateProfileController {
 
     profileService.updateProfile(updateDTO, profilePhoto, resume);
     var res = Response.<Void>success(null, "Profile updated successfully");
+    return ResponseEntity.ok(res);
+  }
+
+  @PreAuthorize("hasRole('ROLE_CANDIDATE') or hasRole('ROLE_RECRUITER')")
+  @GetMapping(path = "/{id}", consumes = MediaType.ALL_VALUE)
+  public ResponseEntity<Response<CandidateProfileGetRequestDto>> getCandidateProfile(
+      @PathVariable("id") Integer candidateId) {
+
+    CandidateProfileGetRequestDto profile = profileService.getCandidateProfileById(candidateId);
+    var res = Response.success(profile, "Profile found successfully");
     return ResponseEntity.ok(res);
   }
 }

@@ -39,6 +39,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.test.context.support.WithAnonymousUser;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ContextConfiguration;
@@ -88,7 +90,7 @@ class CandidateProfileControllerTest {
     addressCountryIsBlankDto.setAddress(Address.builder().state("India").build());
 
     var malformedPortfolioUrlDto = getCandidateProfileUpdateDTO(null);
-    malformedPortfolioUrlDto.setPortfolioWebsite("badurl");
+    malformedPortfolioUrlDto.setPortfolioWebsite("bad-url");
 
     var malformedContactInformationUrlDto = getCandidateProfileUpdateDTO(null);
     malformedContactInformationUrlDto.getContactInformation().setLinkedinHandle("invalid-url");
@@ -139,7 +141,7 @@ class CandidateProfileControllerTest {
         Arguments.of(missingIdDto), // missing id
         Arguments.of(firstNameMandatoryDto),// First Name is mandatory
         Arguments.of(lastNameMandatoryDto),// Last Name is mandatory
-        Arguments.of(allowedCharsInAboutDto), // Maximum number of characters allowed is 10,000
+        Arguments.of(allowedCharsInAboutDto), // The Maximum number of characters allowed is 10,000
         Arguments.of(addressStateIsBlankDto),// Invalid: state is blank
         Arguments.of(addressCountryIsBlankDto),// Invalid: country is blank
         Arguments.of(malformedPortfolioUrlDto),// Invalid: URL is malformed
@@ -224,6 +226,7 @@ class CandidateProfileControllerTest {
   @BeforeEach
   void setUp() {
     when(service.uploadFile(any(), any())).thenReturn(true);
+    when(service.getFileUrl(any())).thenReturn("https://www.google.com");
     doNothing().when(service).deleteFile(anyString());
   }
 
@@ -734,5 +737,107 @@ class CandidateProfileControllerTest {
   private MockMultipartFile convertToMultipartFile(CandidateProfileUpdateDTO dto) throws Exception {
     return new MockMultipartFile("updateDetails", "", MediaType.APPLICATION_JSON_VALUE,
         objectMapper.writeValueAsBytes(dto));
+  }
+
+  @SqlGroup({
+      @Sql(scripts = "/seed-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+  })
+  @Test
+  @DisplayName("Get Candidate Profile without resume and profile photo - Success")
+  @WithMockCandidate
+  void getCandidateProfile_DoesNotHaveResumeAndProfilePhoto_Success() throws Exception {
+    Integer candidateId = 2;
+
+    mockMvc.perform(get("/api/candidate/profile/{id}", candidateId)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("Profile found successfully"))
+        .andExpect(jsonPath("$.data").isNotEmpty())
+        .andExpect(jsonPath("$.data.id").value(candidateId))
+        .andExpect(jsonPath("$.data.firstName").isString())
+        .andExpect(jsonPath("$.data.lastName").isString())
+        .andExpect(jsonPath("$.data.shortAbout").isString())
+        .andExpect(jsonPath("$.data.about").isEmpty())
+        .andExpect(jsonPath("$.data.profilePhotoUrl").isEmpty())
+        .andExpect(jsonPath("$.data.resumeUrl").isEmpty())
+        .andExpect(jsonPath("$.data.portfolioWebsite").isEmpty())
+        .andExpect(jsonPath("$.data.workAuthorization").isEmpty())
+        .andExpect(jsonPath("$.data.preferredEmploymentType").isEmpty())
+        .andExpect(jsonPath("$.data.address").isEmpty())
+        .andExpect(jsonPath("$.data.contactInformation").isMap())
+        .andExpect(jsonPath("$.data.educations").isArray())
+        .andExpect(jsonPath("$.data.interests").isArray())
+        .andExpect(jsonPath("$.data.skills").isArray());
+  }
+
+  @SqlGroup({
+      @Sql(scripts = "/seed-db.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD),
+  })
+  @Test
+  @DisplayName("Get Candidate Profile - Success")
+  @WithMockCandidate
+  void getCandidateProfile_Success() throws Exception {
+    Integer candidateId = 1;
+
+    mockMvc.perform(get("/api/candidate/profile/{id}", candidateId)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.success").value(true))
+        .andExpect(jsonPath("$.message").value("Profile found successfully"))
+        .andExpect(jsonPath("$.data").isNotEmpty())
+        .andExpect(jsonPath("$.data.id").value(candidateId))
+        .andExpect(jsonPath("$.data.firstName").isString())
+        .andExpect(jsonPath("$.data.lastName").isString())
+        .andExpect(jsonPath("$.data.shortAbout").isString())
+        .andExpect(jsonPath("$.data.about").isString())
+        .andExpect(jsonPath("$.data.profilePhotoUrl").isString())
+        .andExpect(jsonPath("$.data.resumeUrl").isString())
+        .andExpect(jsonPath("$.data.portfolioWebsite").isString())
+        .andExpect(jsonPath("$.data.workAuthorization").isString())
+        .andExpect(jsonPath("$.data.preferredEmploymentType").isString())
+        .andExpect(jsonPath("$.data.address").isMap())
+        .andExpect(jsonPath("$.data.contactInformation").isMap())
+        .andExpect(jsonPath("$.data.educations").isArray())
+        .andExpect(jsonPath("$.data.interests").isArray())
+        .andExpect(jsonPath("$.data.skills").isArray());
+  }
+
+  @Test
+  @DisplayName("Get Candidate Profile - Not Found")
+  void getCandidateProfile_NotFound() throws Exception {
+    Integer nonExistentCandidateId = 9999;
+
+    mockMvc.perform(get("/api/candidate/profile/{id}", nonExistentCandidateId)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound())
+        .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+        .andExpect(jsonPath("$.success").value(false))
+        .andExpect(jsonPath("$.message").isString())
+        .andExpect(jsonPath("$.data").doesNotExist());
+  }
+
+  @Test
+  @DisplayName("Get Candidate Profile - Unauthorized")
+  @WithAnonymousUser
+  void getCandidateProfile_Unauthorized() throws Exception {
+    Integer candidateId = 1;
+
+    mockMvc.perform(get("/api/candidate/profile/{id}", candidateId)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  @DisplayName("Get Candidate Profile - Forbidden for non-candidate/recruiter role")
+  @WithMockUser(username = "user@example.com")
+  void getCandidateProfile_Forbidden() throws Exception {
+    Integer candidateId = 1;
+
+    mockMvc.perform(get("/api/candidate/profile/{id}", candidateId)
+            .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isForbidden());
   }
 }

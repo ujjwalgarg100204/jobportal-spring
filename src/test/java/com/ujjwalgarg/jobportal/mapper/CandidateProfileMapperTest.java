@@ -1,10 +1,14 @@
 package com.ujjwalgarg.jobportal.mapper;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.ujjwalgarg.jobportal.constant.EmploymentType;
+import com.ujjwalgarg.jobportal.constant.ExperienceLevel;
 import com.ujjwalgarg.jobportal.constant.WorkAuthorization;
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewCandidateRequest;
+import com.ujjwalgarg.jobportal.controller.payload.candidateprofile.CandidateProfileGetRequestDto;
+import com.ujjwalgarg.jobportal.controller.payload.candidateprofile.SkillGetRequestDto;
 import com.ujjwalgarg.jobportal.controller.payload.common.SkillDetailsDto;
 import com.ujjwalgarg.jobportal.entity.Address;
 import com.ujjwalgarg.jobportal.entity.CandidateBookmarkedJob;
@@ -17,20 +21,18 @@ import com.ujjwalgarg.jobportal.entity.Skill;
 import com.ujjwalgarg.jobportal.entity.User;
 import com.ujjwalgarg.jobportal.service.dto.candidateprofileservice.CandidateProfileUpdateDTO;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {CandidateProfileMapperImpl.class,
-    ContactInformationMapperImpl.class})
+@SpringBootTest
 class CandidateProfileMapperTest {
 
   @Autowired
@@ -82,12 +84,7 @@ class CandidateProfileMapperTest {
                 .shortAbout("Short bio about Jane")
                 .hasProfilePhoto(false)
                 .hasResume(false)
-                .contactInformation(ContactInformation.builder()
-                    .phone(null)
-                    .twitterHandle(null)
-                    .linkedinHandle(null)
-                    .githubHandle(null)
-                    .build())
+                .contactInformation(null)
                 .build()
         ),
         Arguments.of(
@@ -359,5 +356,93 @@ class CandidateProfileMapperTest {
     assertThat(initialEntity.getBookmarkedJobs()).isEqualTo(expectedEntity.getBookmarkedJobs());
     assertThat(initialEntity.getHasProfilePhoto()).isEqualTo(expectedEntity.getHasProfilePhoto());
     assertThat(initialEntity.getHasResume()).isEqualTo(expectedEntity.getHasResume());
+  }
+
+  private static Stream<Arguments> provideValidCandidateProfiles() {
+    return Stream.of(
+        Arguments.of(
+            createFullCandidateProfile(),
+            "https://example.com/photo.jpg",
+            "https://example.com/resume.pdf",
+            new CandidateProfileGetRequestDto(
+                1, "John", "Doe", "Software Developer", "Experienced Java developer",
+                "https://example.com/photo.jpg", "https://example.com/resume.pdf",
+                "https://johndoe.com",
+                WorkAuthorization.CANADIAN_CITIZEN, EmploymentType.FULL_TIME,
+                new Address(), new ContactInformation(),
+                Arrays.asList(new Education(), new Education()),
+                Arrays.asList(new Interest(), new Interest()),
+                Arrays.asList(new SkillGetRequestDto(1, "Skill", "4 yrs", ExperienceLevel.ADVANCE),
+                    new SkillGetRequestDto(2, "SKillName", "5 yrs", ExperienceLevel.INTERMEDIATE))
+            )
+        ),
+        Arguments.of(
+            createMinimalCandidateProfile(),
+            null,
+            null,
+            new CandidateProfileGetRequestDto(
+                2, "Jane", "Smith", "Data Scientist", null,
+                null, null, null, null, null,
+                null, null, null, null, null
+            )
+        )
+    );
+  }
+
+  private static CandidateProfile createFullCandidateProfile() {
+    return CandidateProfile.builder()
+        .id(1)
+        .firstName("John")
+        .lastName("Doe")
+        .shortAbout("Software Developer")
+        .about("Experienced Java developer")
+        .hasProfilePhoto(true)
+        .hasResume(true)
+        .portfolioWebsite("https://johndoe.com")
+        .workAuthorization(WorkAuthorization.CANADIAN_CITIZEN)
+        .preferredEmploymentType(EmploymentType.FULL_TIME)
+        .address(new Address())
+        .contactInformation(new ContactInformation())
+        .educations(Arrays.asList(new Education(), new Education()))
+        .interests(Arrays.asList(new Interest(), new Interest()))
+        .skills(Arrays.asList(new Skill(1, "Skill", "4 yrs", ExperienceLevel.ADVANCE, null),
+            new Skill(2, "SKillName", "5 yrs", ExperienceLevel.INTERMEDIATE, null)))
+        .build();
+  }
+
+  private static CandidateProfile createMinimalCandidateProfile() {
+    return CandidateProfile.builder()
+        .id(2)
+        .firstName("Jane")
+        .lastName("Smith")
+        .shortAbout("Data Scientist")
+        .build();
+  }
+
+  @ParameterizedTest(name = "{index} - {displayName}")
+  @MethodSource("provideValidCandidateProfiles")
+  @DisplayName("Test toCandidateProfileGetRequest() with valid CandidateProfile and URLs")
+  void toCandidateProfileGetRequest_validProfileAndUrls_returnsMappedDto(
+      CandidateProfile profile, String profilePhotoUrl, String resumeUrl,
+      CandidateProfileGetRequestDto expected) {
+    CandidateProfileGetRequestDto actual = candidateProfileMapper.toCandidateProfileGetRequest(
+        profile, profilePhotoUrl, resumeUrl);
+    assertThat(actual).usingRecursiveComparison().isEqualTo(expected);
+  }
+
+  @Test
+  @DisplayName("Test toCandidateProfileGetRequest() when input is null")
+  void toCandidateProfileGetRequest_nullInput_returnsNull() {
+    assertNull(candidateProfileMapper.toCandidateProfileGetRequest(null, null, null));
+  }
+
+  @Test
+  @DisplayName("Test toCandidateProfileGetRequest() with valid profile but null URLs")
+  void toCandidateProfileGetRequest_validProfileNullUrls_returnsMappedDtoWithNullUrls() {
+    CandidateProfile profile = createFullCandidateProfile();
+    CandidateProfileGetRequestDto dto = candidateProfileMapper.toCandidateProfileGetRequest(profile,
+        null, null);
+    assertThat(dto.profilePhotoUrl()).isNull();
+    assertThat(dto.resumeUrl()).isNull();
   }
 }

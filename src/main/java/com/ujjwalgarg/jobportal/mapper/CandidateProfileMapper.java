@@ -1,6 +1,7 @@
 package com.ujjwalgarg.jobportal.mapper;
 
 import com.ujjwalgarg.jobportal.controller.payload.auth.NewCandidateRequest;
+import com.ujjwalgarg.jobportal.controller.payload.candidateprofile.CandidateProfileGetRequestDto;
 import com.ujjwalgarg.jobportal.entity.CandidateProfile;
 import com.ujjwalgarg.jobportal.service.dto.candidateprofileservice.CandidateProfileUpdateDTO;
 import org.mapstruct.BeanMapping;
@@ -11,7 +12,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.mapstruct.ReportingPolicy;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {
-    ContactInformationMapper.class})
+    ContactInformationMapper.class, SkillMapper.class})
 public interface CandidateProfileMapper {
 
   @Mapping(source = "firstName", target = "firstName")
@@ -31,4 +32,9 @@ public interface CandidateProfileMapper {
   @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
   void updateCandidateProfileFromDTO(CandidateProfileUpdateDTO dto,
       @MappingTarget CandidateProfile entity);
+
+  @Mapping(target = "profilePhotoUrl", source = "profilePhotoUrl")
+  @Mapping(target = "resumeUrl", source = "resumeUrl")
+  CandidateProfileGetRequestDto toCandidateProfileGetRequest(CandidateProfile profile,
+      String profilePhotoUrl, String resumeUrl);
 }

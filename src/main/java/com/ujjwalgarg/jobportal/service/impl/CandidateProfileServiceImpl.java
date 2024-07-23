@@ -2,6 +2,7 @@ package com.ujjwalgarg.jobportal.service.impl;
 
 import com.ujjwalgarg.jobportal.annotation.FileContentType;
 import com.ujjwalgarg.jobportal.annotation.FileSize;
+import com.ujjwalgarg.jobportal.controller.payload.candidateprofile.CandidateProfileGetRequestDto;
 import com.ujjwalgarg.jobportal.entity.CandidateProfile;
 import com.ujjwalgarg.jobportal.exception.NotFoundException;
 import com.ujjwalgarg.jobportal.mapper.CandidateProfileMapper;
@@ -44,17 +45,13 @@ public class CandidateProfileServiceImpl implements CandidateProfileService {
       @RequestPart(value = "resume", required = false) @Valid @FileSize(min = 10, max = (long) 5e6, message = "File size must be between 100 bytes and 5 MB.", allowEmpty = false) @FileContentType(allowedTypes = "application/pdf") MultipartFile resume,
       @RequestPart(value = "profilePhoto", required = false) @Valid @FileSize(min = 10, max = (long) 5e6, message = "File size must be between 100 bytes and 5 MB.", allowEmpty = false) @FileContentType(allowedTypes = {
           "image/png", "image/jpg", "image/jpeg"}) MultipartFile profilePhoto) throws IOException {
-    CandidateProfile profile = candidateProfileRepository.findById(updateDTO.getId())
-        .orElseThrow(() -> {
-          log.error("Candidate Profile not found for id: {}", updateDTO.getId());
-          return new NotFoundException("Candidate Profile not found");
-        });
+    CandidateProfile profile = getProfileById(updateDTO.getId());
     profileMapper.updateCandidateProfileFromDTO(updateDTO, profile);
     profile.setUser(userService.getUserById(profile.getId()));
 
     // delete or upload profile photo
     if (profilePhoto != null) {
-      // save profile photo in storage
+      // save the profile photo in storage
       String profilePhotoPath = getProfilePhotoPath(profile.getId());
       boolean success = fileUploadService.uploadFile(profilePhotoPath, profilePhoto.getBytes());
       if (success) {
@@ -79,5 +76,28 @@ public class CandidateProfileServiceImpl implements CandidateProfileService {
     }
 
     candidateProfileRepository.save(profile);
+  }
+
+  @Override
+  public CandidateProfileGetRequestDto getCandidateProfileById(Integer id)
+      throws NotFoundException {
+    CandidateProfile profile = getProfileById(id);
+    String resumeUrl = null;
+    if (Boolean.TRUE.equals(profile.getHasResume())) {
+      resumeUrl = fileUploadService.getFileUrl(getResumePath(profile.getId()));
+    }
+    String profilePhotoUrl = null;
+    if (Boolean.TRUE.equals(profile.getHasProfilePhoto())) {
+      profilePhotoUrl = fileUploadService.getFileUrl(getProfilePhotoPath(profile.getId()));
+    }
+    return profileMapper.toCandidateProfileGetRequest(profile, profilePhotoUrl, resumeUrl);
+  }
+
+  private CandidateProfile getProfileById(Integer id) throws NotFoundException {
+    return candidateProfileRepository.findById(id)
+        .orElseThrow(() -> {
+          log.error("Candidate Profile not found for id: {}", id);
+          return new NotFoundException("Candidate Profile not found");
+        });
   }
 }
